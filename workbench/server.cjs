@@ -1,11 +1,11 @@
 'use strict';
 const http=require('node:http'),fs=require('node:fs'),fsp=fs.promises,path=require('node:path'),crypto=require('node:crypto');
-const {execFile}=require('node:child_process');
-const {promisify}=require('node:util');const run=promisify(execFile);
+const {defaultCodex,sameProjectPath,pickFolder}=require('./platform.cjs');
+const CODEX=process.env.HACKCLAW_CODEX||defaultCodex();
 const {CodexBridge}=require('./bridge.cjs');const {reduceEvent}=require('./state.cjs');
 const {AttachmentStore}=require('./attachments.cjs');const {normalizeModel,turnOptions}=require('./model-options.cjs');
 const {TerminalManager}=require('./terminal.cjs'),{GitService}=require('./git-service.cjs'),{PluginManager}=require('./plugins.cjs');
-const terminals=new TerminalManager(),git=new GitService(),plugins=new PluginManager(process.env.HACKCLAW_CODEX||'codex.exe');
+const terminals=new TerminalManager(),git=new GitService(),plugins=new PluginManager(CODEX);
 const ROOT=__dirname,DATA=path.resolve(process.env.HACKCLAW_DATA_DIR||path.join(ROOT,'data')),PORT=Number(process.env.HACKCLAW_PORT||43137),ORIGIN=`http://127.0.0.1:${PORT}`;
 const attachments=new AttachmentStore(path.join(DATA,'attachments')),sendingThreads=new Set();
 const token=crypto.randomBytes(32).toString('hex'),subscribers=new Set(),approvals=new Map(),loaded=new Set();
@@ -18,7 +18,7 @@ function snapshot(){return {...state,connection,connectionError,account,models,a
 function persist(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{const tmp=path.join(DATA,'state.tmp');fs.writeFileSync(tmp,JSON.stringify(state));fs.renameSync(tmp,path.join(DATA,'state.json'))}catch(e){connectionError='History save failed: '+e.message;notify()}},200)}
 function notify(){if(notifyTimer)return;notifyTimer=setTimeout(()=>{notifyTimer=null;const s='data: '+JSON.stringify(snapshot())+'\n\n';for(const client of subscribers)client.write(s)},40)}
 function changed(){persist();notify()}
-const bridge=new CodexBridge(process.env.HACKCLAW_CODEX||'codex.exe');
+const bridge=new CodexBridge(CODEX);
 bridge.on('notification',m=>{
   const p=m.params||{};const t=state.threads.find(x=>x.id===p.threadId);
   if(t){reduceEvent(t,m.method,p);if(m.method==='turn/completed')for(const [id,r] of approvals)if(r.params.threadId===t.id)approvals.delete(id);changed()}
@@ -93,12 +93,9 @@ async function action(url,input){
   if(url==='/api/project'){
     if(typeof input.path!=='string'||!path.isAbsolute(input.path))throw Error('请输入绝对目录路径');
     const real=await fsp.realpath(input.path);if(!(await fsp.stat(real)).isDirectory())throw Error('不是文件夹');
-    let p=state.projects.find(x=>x.path.toLowerCase()===real.toLowerCase());if(!p){p={id:crypto.randomUUID(),name:path.basename(real),path:real};state.projects.push(p);changed()}return p;
+    let p=state.projects.find(x=>sameProjectPath(x.path,real));if(!p){p={id:crypto.randomUUID(),name:path.basename(real),path:real};state.projects.push(p);changed()}return p;
   }
-  if(url==='/api/pick-folder'){
-    const script="Add-Type -AssemblyName System.Windows.Forms; $dialog = New-Object System.Windows.Forms.FolderBrowserDialog; $dialog.Description = 'UNIT-02 - Select project folder'; if ($dialog.ShowDialog() -eq 'OK') { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8; [Console]::Write($dialog.SelectedPath) }";
-    const result=await run('powershell.exe',['-NoProfile','-STA','-EncodedCommand',Buffer.from(script,'utf16le').toString('base64')],{windowsHide:true,timeout:120000});return {path:result.stdout.trim()};
-  }
+  if(url==='/api/pick-folder')return {path:await pickFolder()};
   if(url==='/api/thread'){
     if(connection!=='connected')throw Error('Codex 未连接');if(!account.signedIn)throw Error('请先通过官方流程登录');
     const p=project(input.projectId);const mode=input.mode==='workspace-write'?'workspace-write':'read-only';const choice=turnOptions(models,input.model,input.effort);

@@ -4,6 +4,7 @@ const {EventEmitter}=require('node:events');
 const readline=require('node:readline');
 const fs=require('node:fs');
 const path=require('node:path');
+const {defaultCodex}=require('./platform.cjs');
 
 function launchCommand(executable){
   if(!/\.(?:ps1|cmd|bat)$/i.test(executable))return {executable,args:[]};
@@ -14,7 +15,7 @@ function launchCommand(executable){
 }
 
 class CodexBridge extends EventEmitter {
-  constructor(executable='codex.exe',spawnProcess=spawn) {super();this.executable=executable;this.spawnProcess=spawnProcess;this.pending=new Map();this.nextId=1;this.connected=false;}
+  constructor(executable=defaultCodex(),spawnProcess=spawn) {super();this.executable=executable;this.spawnProcess=spawnProcess;this.pending=new Map();this.nextId=1;this.connected=false;}
   async start(){
     if(this.child)throw Error('Bridge already started');
     const command=launchCommand(this.executable);

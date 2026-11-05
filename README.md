@@ -1,10 +1,12 @@
 # EVA Codex Workbench
 
-Windows 本地 Codex 工作台，红黑主题、启动动画及真实 Codex 连接。**0.3.1 预览版**，不是官方客户端，也不修改官方安装或已有桌面入口。
+Windows / macOS 本地 Codex 工作台，红黑主题、启动动画及真实 Codex 连接。**0.3.1 预览版**，不是官方客户端，也不修改官方安装或已有桌面入口。
 
 公开版保留动画结构和功能，人物图片、NERV／OpenAI 图案使用中性 SVG 占位，系统播报使用与私人版完全相同的日语原录音。人物与图案仍与完整私人演示视频有差异，日语系统播报已恢复，不包含原作素材包或 BGM。此目录也不包含另一个“动画后打开官方客户端”的独立启动器。
 
 ## 安装与启动
+
+### Windows
 
 1. 使用 Windows 10/11，安装 Microsoft Edge、Node.js 20+（含 npm）、官方 Codex CLI。Git 面板还需安装较新的 Git for Windows。
 2. 确认 node --version、npm --version、codex --version 可用。先用自己的账号完成官方 Codex 登录；首次运行工作台未登录时也可点击左下角登录。
@@ -13,13 +15,24 @@ Windows 本地 Codex 工作台，红黑主题、启动动画及真实 Codex 连�
 5. 双击 Start-EVA.cmd。同步率到 99.2% 后点击驾驶员确认，补完到 100% 并进入工作台。
 6. 添加本地项目；默认只读，需要编辑时在新对话中选择允许项目写入。额外权限由用户确认。
 
+### macOS
+
+1. 安装 Node.js 20+（含 npm）、官方 Codex CLI，以及 Microsoft Edge 或 Google Chrome（放在 `/Applications` 或 `~/Applications`）。Git 面板还需本机 Git；可通过 `xcode-select --install` 安装 Apple 命令行工具。
+2. 在终端确认 `node --version`、`npm --version`、`codex --version` 可用，使用 `codex login` 完成自己的官方账号登录。
+3. 克隆或完整解压项目，在项目根目录运行 `npm run setup`，或双击 `Install-Dependencies.command`。安装会修正 node-pty 1.1.0 的 macOS `spawn-helper` 执行权限；若原生依赖需要本机编译，先安装 Apple 命令行工具。
+4. 双击 `Start-EVA.command`，或在项目根目录运行 `npm run start:mac`。Finder 启动时会额外查找 Apple Silicon 与 Intel Homebrew 的默认工具目录；自定义安装的 Codex 可用 `HACKCLAW_CODEX=/绝对路径/codex npm run start:mac` 指定。
+5. 启动器会使用独立的 Edge / Chrome 应用窗口和浏览器配置，不改动已有浏览器个人配置。同步率到 99.2% 后点击驾驶员确认进入工作台。项目选择使用 macOS 原生文件夹对话框，终端使用 `$SHELL`（未设置时为 `/bin/zsh`）；发送消息支持 **⌘+Enter** 和 Ctrl+Enter。
+6. **保持启动器的 Terminal 窗口打开**。使用工作台退出按钮或在此窗口按 Control+C 结束服务；关掉浏览器窗口不等于退出服务。重复启动只复用同端口的 EVA 服务，不会停止其他启动器创建的服务。
+
+默认地址是 `http://127.0.0.1:43137`。可通过 `npm run start:mac -- --port 43200` 换端口，或加 `--no-browser` 仅启动服务。若 `.command` 在 ZIP 解压后丢失执行权限，在项目目录运行 `chmod +x Start-EVA.command Install-Dependencies.command`；也可直接使用上述 npm 命令。若 macOS 拦截下载的脚本，先检查来源及内容，再在 Finder 中右键 → 打开；无需关闭系统安全保护。
+
 重播使用顶部按钮，退出使用工作台退出按钮。更新时先退出服务，保留自己的 workbench/data，再替换运行文件并重新安装依赖。不要把 data 上传给维护者。
 
 ## 功能和边界
 
 - 真实 Codex：流式聊天、图片输入、模型与思考强度选择、项目任务、命令结果、文件变更、Diff、停止和权限确认。
 - 本工作台会话：保存、重启接续、重命名和归档。**尚未提供官方全部历史会话的浏览／导入，不保证同账号跨设备历史同步。**
-- PowerShell 终端：多会话、输入输出、Ctrl+C、尺寸适配。关闭工具面板后继续运行，退出服务时结束。手动终端不受聊天只读设置限制。
+- 本机终端：Windows 使用 PowerShell，macOS 使用 `$SHELL` / zsh；支持多会话、输入输出、Ctrl+C、尺寸适配。关闭工具面板后继续运行，退出服务时结束。手动终端不受聊天只读设置限制。
 - Git：仓库根目录的状态和差异、暂存／取消暂存、提交、创建／切换本地分支、获取、快进拉取和推送。不提供强推、自动合并、回滚或丢弃；认证由本机 Git 负责。
 - 插件：使用官方 codex plugin 命令搜索已配置市场，查看安装／启用状态、安装与卸载。新对话使用更新后的插件；账号连接在官方客户端完成。没有独立启停、市场配置编辑或自动授权，也不保证与 ChatGPT 桌面插件同步。旧 CLI 不支持 plugin 时需更新 CLI。
 
@@ -27,7 +40,7 @@ Windows 本地 Codex 工作台，红黑主题、启动动画及真实 Codex 连�
 
 ## 数据与验证
 
-本地状态、图片附件及独立 Edge 配置位于 workbench/data。不复制官方账号文件，不打包凭据，不发送诊断日志。终端输出仅在内存保存最近约 512 KB。
+本地状态、图片附件及独立 Edge / Chrome 配置位于 workbench/data。不复制官方账号文件，不打包凭据，不发送诊断日志。终端输出仅在内存保存最近约 512 KB。
 
 运行 npm test 做代码检查。新终端、Git 操作及插件管理已在维护者电脑验证；全新设备、不同 CLI 分发方式及首次登录仍需要反馈。提交问题时只提供报错截图、系统／Node／Codex 版本和复现步骤，不上传登录文件、完整认证链接、项目秘密或聊天数据。
 

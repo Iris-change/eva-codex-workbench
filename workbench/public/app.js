@@ -50,7 +50,7 @@ function paint(){
  const ms=JSON.stringify(t?.messages||[]);if(messageSignature!==ms+threadId){const area=$('messages'),atBottom=area.scrollHeight-area.scrollTop-area.clientHeight<100;area.replaceChildren();if(!t?.messages.length)area.append(emptyMessages());else for(const m of t.messages){if(!m.text&&!m.attachments?.length)continue;const box=el('article','message '+m.role);box.append(el('div','message-role',m.role==='user'?'你':'Codex'));if(m.attachments?.length){const images=el('div','message-attachments');for(const item of m.attachments){const link=el('a');link.href=item.url;link.target='_blank';link.rel='noopener';const image=el('img');image.src=item.url;image.alt=item.name;image.loading='lazy';link.append(image);images.append(link)}box.append(images)}richText(box,m.text||'');area.append(box)}if(atBottom||messageSignature==='')area.scrollTop=area.scrollHeight;messageSignature=ms+threadId}
  const busy=sending||t?.status==='inProgress';$('send').disabled=busy||attachmentComposer.pending>0||!!t?.archived||state.connection!=='connected'||!state.account?.signedIn;$('cancel').hidden=!busy;$('cancel').disabled=!t?.activeTurn;$('retry').disabled=busy||!!t?.archived||!t?.messages.some(m=>m.role==='user');
  paintModelControls(t,busy);$('threadActions').hidden=!t;$('archiveThread').disabled=busy;$('archiveThread').textContent=t?.archived?'恢复':'归档';$('renameThread').disabled=busy;
- $('composerHint').textContent=t?.archived?'这条对话已归档，点击“恢复”后可以继续。':'Ctrl + Enter 发送 · 支持粘贴或拖入图片 · 额外权限由你确认';
+ $('composerHint').textContent=t?.archived?'这条对话已归档，点击“恢复”后可以继续。':'⌘ / Ctrl + Enter 发送 · 支持粘贴或拖入图片 · 额外权限由你确认';
  document.querySelector('main').dataset.codexActivity=busy?'active':(t?.status||'idle');
  document.querySelector('main').dataset.codexConnection=state.connection||'connecting';
  const status={idle:'就绪',inProgress:'Codex 正在执行…',completed:'任务完成',failed:'任务失败',interrupted:'已停止'}[t?.status]||'就绪';
@@ -76,7 +76,7 @@ function paintApprovals(){const r=state.approvals[0];if(!r){approvalId=null;if($
 }
 async function send(text,providedAttachments){if(sending||attachmentComposer.pending)return;if(!projectId){$('projectDialog').showModal();return}const images=providedAttachments||attachmentComposer.items.slice();if(!text.trim()&&!images.length)return;const model=$('model').value,effort=$('effort').value;sending=true;notify('');paint();try{if(!threadId){const t=await api('/api/thread',{projectId,mode:$('mode').value,model,effort});if(!state.threads.some(x=>x.id===t.id))state.threads.push(t);chooseThread(t,true)}await api('/api/send',{threadId,text,attachments:images.map(x=>x.id),model,effort});$('prompt').value='';attachmentComposer.removeSent(images.map(x=>x.id))}finally{sending=false;paint()}}
 $('composer').onsubmit=guarded(async e=>{e.preventDefault();await send($('prompt').value)});
-$('prompt').onkeydown=e=>{if(e.ctrlKey&&e.key==='Enter'){e.preventDefault();$('composer').requestSubmit()}};
+$('prompt').onkeydown=e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'&&!e.isComposing&&e.keyCode!==229){e.preventDefault();$('composer').requestSubmit()}};
 $('newTask').onclick=()=>{threadId='';localStorage.removeItem('hc-thread');messageSignature='';$('mode').disabled=false;attachmentComposer.clear();paint();$('prompt').focus()};
 $('model').onchange=()=>{$('effort').value='';$('effort').dataset.catalog='';paintModelControls(selected(),sending||selected()?.status==='inProgress')};
 $('threadSearch').oninput=()=>paint();$('toggleArchived').onclick=()=>{showArchived=!showArchived;paint()};
