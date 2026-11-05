@@ -1,0 +1,12 @@
+workbench/data/
+workbench/.verification/
+workbench/tests/current/
+workbench/tests/sandbox/
+workbench/tools/diagnostic-logs/
+**/node_modules/
+.env
+.env.*
+*.log
+*.mp4
+*.zip
+PRIVATE*/

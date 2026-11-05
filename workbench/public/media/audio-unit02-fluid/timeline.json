@@ -1,0 +1,47 @@
+{
+  "duration": 20,
+  "sampleRate": 48000,
+  "placeholder": true,
+  "language": "ja-JP",
+  "engine": "silent placeholder; supply your own licensed recording",
+  "voice": null,
+  "processing": "20-second mono PCM silence",
+  "cues": [
+    {
+      "start": 0.35,
+      "end": 2.2575,
+      "ja": "ネルフ、システム起動。",
+      "zh": "NERV 系统启动"
+    },
+    {
+      "start": 3.35,
+      "end": 5.6001,
+      "ja": "LCL、注入開始。",
+      "zh": "LCL 循环注入"
+    },
+    {
+      "start": 8.1,
+      "end": 9.5888,
+      "ja": "シンクロ、開始。",
+      "zh": "开始驾驶员同步"
+    },
+    {
+      "start": 11.5,
+      "end": 12.7707,
+      "ja": "同期、確認。",
+      "zh": "驾驶员同步确认"
+    },
+    {
+      "start": 14.6,
+      "end": 15.6374,
+      "ja": "アクセス許可。",
+      "zh": "访问已授权"
+    },
+    {
+      "start": 18,
+      "end": 19.5925,
+      "ja": "システム、オンライン。",
+      "zh": "系统在线"
+    }
+  ]
+}

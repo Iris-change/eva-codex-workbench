@@ -1,0 +1,382 @@
+{
+  "prepared": "2026-11-05",
+  "status": "public-preview",
+  "version": "0.3.0-preview",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 8,
+      "sha256": "705fd4d6451a31d36b3df7de96f83f30ac976c9b4a6d1e51671d8e2f33e2d0da"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 181,
+      "sha256": "6d9fffddae6f726f4a7de1da36d0efba02ed895a671d4ec81dd71fd6b4e40047"
+    },
+    {
+      "path": "ASSETS.md",
+      "bytes": 632,
+      "sha256": "72fb45c13400ac06a5a7d7008c87f84455a57400b169f5016652cba8504c0e71"
+    },
+    {
+      "path": "CODE-ORIGINS.md",
+      "bytes": 2135,
+      "sha256": "e5c145416ab5db35f75c4d9d83a7247bd01f87cd82e13d37353a3c95517af8c8"
+    },
+    {
+      "path": "Install-Dependencies.cmd",
+      "bytes": 163,
+      "sha256": "ccefe6317fec9785bc5bc3bec07e80d2d68783444555a95ddd9b7f9c0407f51d"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 1068,
+      "sha256": "b577f03da926fd19c7f5b0cb399f541b716ff1729935058c9353ff37ce0374d4"
+    },
+    {
+      "path": "LICENSE-STATUS.md",
+      "bytes": 287,
+      "sha256": "b496f2f93e45617e324cc765122b340f13deef72b7e6903ff1f14a64f475c6c4"
+    },
+    {
+      "path": "licenses/DragonCodexBoot-MIT.txt",
+      "bytes": 1087,
+      "sha256": "4ffc2131be78bd83127661a0f6a2994bc05df71bfd9b629beb585cced63e67b1"
+    },
+    {
+      "path": "package.json",
+      "bytes": 279,
+      "sha256": "af5d524feb369d5b98c629b16b46a2f76ae297a1978994b8e23a41273ecdae9c"
+    },
+    {
+      "path": "PROVENANCE.md",
+      "bytes": 1319,
+      "sha256": "f9b8f4c616d298eea800b725667e513b1b1b5431214c448f8c2934ed13f26284"
+    },
+    {
+      "path": "PUBLIC-RELEASE-CHECKLIST.md",
+      "bytes": 920,
+      "sha256": "cc98b4ba9f7df99c05457c39180242d2dc0da5c823c11e5e10b4dbb1d6248444"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3706,
+      "sha256": "cdd78a8adc91d2013088a1388c7223b8040ef381c624d541b556a37ca45ed3a5"
+    },
+    {
+      "path": "Start-EVA.cmd",
+      "bytes": 131,
+      "sha256": "e28cafd4e71737684ecb5bf50fccc979d0563d6aeed249fba6454313ece66eab"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "bytes": 1126,
+      "sha256": "44d3fe947a4926467d909f8940de7875c1447e365280379cbaf443cce6989f47"
+    },
+    {
+      "path": "VALIDATION.md",
+      "bytes": 611,
+      "sha256": "78cdf7b4bc410dda026d0b135a12876760fad9fb21750738a6aeb7d5e8c059af"
+    },
+    {
+      "path": "workbench/attachments.cjs",
+      "bytes": 3027,
+      "sha256": "06f42bbe10907c14bf9cb9dcb04ff0e9876d94be4ab310b52cd431c309b66b40"
+    },
+    {
+      "path": "workbench/bridge.cjs",
+      "bytes": 3603,
+      "sha256": "0f2b46378a34efd3c7c753ef663fad73e76b2724971eacf45991f675009bb369"
+    },
+    {
+      "path": "workbench/git-service.cjs",
+      "bytes": 3683,
+      "sha256": "28f2b378780cdbdc94d827f2cb8c138e4e02cd65c8efb5a1784dc41224730167"
+    },
+    {
+      "path": "workbench/licenses/node-pty-MIT.txt",
+      "bytes": 3326,
+      "sha256": "a3d60eaf32d2fb09c9d82ef39f14bd6e2c0f3ca7de30daa827486c0d6f8b6e9f"
+    },
+    {
+      "path": "workbench/licenses/README.md",
+      "bytes": 515,
+      "sha256": "7085e5a456705fc5c278e06213e4148a8a30f51743c27932f89ec9538e65791f"
+    },
+    {
+      "path": "workbench/licenses/xterm-addon-fit-MIT.txt",
+      "bytes": 1103,
+      "sha256": "e256f01188af527e4d06d21d06fbf785ae9c50d4b328bf03cbe0ba7f0aa4228f"
+    },
+    {
+      "path": "workbench/licenses/xterm-MIT.txt",
+      "bytes": 1261,
+      "sha256": "b569f629d00f2626a8100df2a1798210535621e42164dfd426a6fe5aac7b0ccd"
+    },
+    {
+      "path": "workbench/model-options.cjs",
+      "bytes": 821,
+      "sha256": "9c3e760b9883e55c22e34e734bf24b273223702524e55f26b0bd032fac643aef"
+    },
+    {
+      "path": "workbench/package-lock.json",
+      "bytes": 1750,
+      "sha256": "c1800180991a5542f41b948e802ec7989f7ddf7390b42b932fe335f78f13d9cf"
+    },
+    {
+      "path": "workbench/package.json",
+      "bytes": 340,
+      "sha256": "7fcedf7d8c012671d5115dff947bcc356d325a71a887d14626db4892342fb995"
+    },
+    {
+      "path": "workbench/plugins.cjs",
+      "bytes": 2313,
+      "sha256": "4eda977bafa96a61fe409875dd38ba61f9a3ecdd727bf475ff14eb6c9d29a208"
+    },
+    {
+      "path": "workbench/public/app.js",
+      "bytes": 26832,
+      "sha256": "ff3eb8f03f9e65bf7492a35e89ce9b595c9ded786a88760d95013b953e8e7308"
+    },
+    {
+      "path": "workbench/public/attachments-ui.js",
+      "bytes": 4402,
+      "sha256": "d7688d67360b99ca5fbaaa86be19345da10dfecf41fa26ca69ab613527e77e3d"
+    },
+    {
+      "path": "workbench/public/boot-atmosphere.js",
+      "bytes": 2013,
+      "sha256": "9b4523ac9bc2186bf3524a7901ac3224efec9899b6a93e86cb114c4c852932ec"
+    },
+    {
+      "path": "workbench/public/codex-link.js",
+      "bytes": 829,
+      "sha256": "4a4d8b47261a7f49d4a25f9abaa4427b605995249d40c9c0e4ff6bf78e9f8ab1"
+    },
+    {
+      "path": "workbench/public/dev-tools.css",
+      "bytes": 2152,
+      "sha256": "e7e18d54ed86e736a4c90f3532e81eda8d8a0c41d41d87d5b198dfdd354e0130"
+    },
+    {
+      "path": "workbench/public/dev-tools.js",
+      "bytes": 9820,
+      "sha256": "3754f06d56fe01fe121ca927d3582ca814e19a3a8f26fdf5c45ffa280f86c284"
+    },
+    {
+      "path": "workbench/public/features.css",
+      "bytes": 3158,
+      "sha256": "0e81db52e2e95be48cca13d7f6a00fc2cbc293015bc40865d2955ecc75685593"
+    },
+    {
+      "path": "workbench/public/fonts/mincho.css",
+      "bytes": 215,
+      "sha256": "617977cb45215fe4d7fe3a95f2b0f923d89b58921fd160e238c7a5c7deb76ef9"
+    },
+    {
+      "path": "workbench/public/fonts/OFL-NotoSerifCJK.txt",
+      "bytes": 4301,
+      "sha256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2"
+    },
+    {
+      "path": "workbench/public/fonts/SOURCES.md",
+      "bytes": 821,
+      "sha256": "1c2bb36b7c153fbcb27c18c43ecf79f5a078c1c98bd3d0a5c44aaecf7e3e3c82"
+    },
+    {
+      "path": "workbench/public/fonts/unit02-mincho-black.woff2",
+      "bytes": 181636,
+      "sha256": "9fc4a47a81d503580674d4b754b84b17557e57ca53136abd6c563a6892c93d65"
+    },
+    {
+      "path": "workbench/public/index.html",
+      "bytes": 9707,
+      "sha256": "1082f0c86a5d337979869bb1e85c3d03cc358cb0f44c09dce5f63971439b8b08"
+    },
+    {
+      "path": "workbench/public/intro-cg.js",
+      "bytes": 15529,
+      "sha256": "2b18664d4fcc7030379171483bcf7c04b8db3ae0fc2ae29d13fa6424ec25963b"
+    },
+    {
+      "path": "workbench/public/intro.css",
+      "bytes": 8561,
+      "sha256": "8b8abe467b09fb87d3bc023a928ae463acdde77da34f6dafc10b17ecd229b459"
+    },
+    {
+      "path": "workbench/public/intro.html",
+      "bytes": 1780,
+      "sha256": "c8cf65222846cccdd81d8d2bcacdaf622317ae9c5af7d4ea4f8ccc6e3bae5700"
+    },
+    {
+      "path": "workbench/public/intro.js",
+      "bytes": 887,
+      "sha256": "3ff03d9c542170b0d4602b6090b47e2f419b6ef457393b683b5385cdbedf32a0"
+    },
+    {
+      "path": "workbench/public/media/audio-unit02-fluid/timeline.json",
+      "bytes": 1007,
+      "sha256": "ddce42bb366ae377322be704c5f739acfe5ec09172ca36256b3e3e6bffb628da"
+    },
+    {
+      "path": "workbench/public/media/audio-unit02-fluid/voice.wav",
+      "bytes": 1920044,
+      "sha256": "d85c8af3ff68fa7dec3d39d1b430293752de59f30da354b7ab30ea2be6c1c5f5"
+    },
+    {
+      "path": "workbench/public/media/eva/nerv-mark.svg",
+      "bytes": 398,
+      "sha256": "b9bb4d189d2753544e80b3bdb14a026433580c74e7b192ad6207286a056c6c98"
+    },
+    {
+      "path": "workbench/public/media/eva/theme-title.svg",
+      "bytes": 206,
+      "sha256": "e17ae424f1f71f3e49310effed67dafb9615aa92b550439ca244dce866201917"
+    },
+    {
+      "path": "workbench/public/media/official/codex-node.svg",
+      "bytes": 282,
+      "sha256": "5eab43291f55b158fe2eac585cd5e44875ea1e08caeea486fe088b2c023add3f"
+    },
+    {
+      "path": "workbench/public/media/pilot/pilot-linework.svg",
+      "bytes": 260,
+      "sha256": "2614e699af8dbe3d3306df8a265c5ea39da6fbc70c42f0e38dcfc2b28ab4f16e"
+    },
+    {
+      "path": "workbench/public/media/pilot/pilot-placeholder.svg",
+      "bytes": 431,
+      "sha256": "996c5aa57efd741148cf7891b2cb3bb077b5efebcada61623e4715453aa042c2"
+    },
+    {
+      "path": "workbench/public/motion-v12.js",
+      "bytes": 885,
+      "sha256": "17dc799bfb910defbbd3cac2cd47c30fd74466ab850daca9beb69a48531a5467"
+    },
+    {
+      "path": "workbench/public/protocol-fx.js",
+      "bytes": 2767,
+      "sha256": "89a049c3e3839031d3eea5ad4ed4d9d6a8a6e5e0c755d0ef1f2745925eec34a3"
+    },
+    {
+      "path": "workbench/public/scan-workbench.js",
+      "bytes": 4535,
+      "sha256": "98a6d5fe2df8a1db2559f4bb8f7fba4cca256d9cb44d722f3d285c62cce69ff6"
+    },
+    {
+      "path": "workbench/public/sequence-audio.js",
+      "bytes": 1299,
+      "sha256": "44c3845292ce9c1f677bfd1d7d81bca49c733213343372f754cc2c88e95231a6"
+    },
+    {
+      "path": "workbench/public/sequence-timing.js",
+      "bytes": 441,
+      "sha256": "c5c1470823f403b64ff2223ef58bb052f6cc9c188585e7ae044211d9557c9509"
+    },
+    {
+      "path": "workbench/public/stage-layout.js",
+      "bytes": 457,
+      "sha256": "4531b86f508672f1ec6edb4f10b946c6d103e81c568cada0fe09b6d7f8126425"
+    },
+    {
+      "path": "workbench/public/style.css",
+      "bytes": 25175,
+      "sha256": "f86b8b204bcc607e7697a413e224813beafa9430a9f69dc1b5f4b4e00aeecf84"
+    },
+    {
+      "path": "workbench/public/unified-sequence.js",
+      "bytes": 6734,
+      "sha256": "66bf429d460a0653fe2eb030d196891ce8b67cbf7ac4bbb26564fea4af578b88"
+    },
+    {
+      "path": "workbench/public/unit02.css",
+      "bytes": 11245,
+      "sha256": "e2689c91d4a47a7566fb1f81726b96340dba95cdabbf1bcd4dcb8e5ae0d702e5"
+    },
+    {
+      "path": "workbench/public/vendor/HTML-TO-IMAGE-LICENSE.txt",
+      "bytes": 1066,
+      "sha256": "dcfe4a33fbd700305cf9308c02e8800dbef57c46ecc26ce2f4438b28a0bd9571"
+    },
+    {
+      "path": "workbench/public/vendor/html-to-image.js",
+      "bytes": 20562,
+      "sha256": "a90b42909d80964269ef6d5f3d1e4a5a7e2a4c263a5d2a76a9e7151901343262"
+    },
+    {
+      "path": "workbench/public/vendor/THREE-LICENSE.txt",
+      "bytes": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "path": "workbench/public/vendor/three.core.js",
+      "bytes": 1403455,
+      "sha256": "eb077d2417f61d3e6d9264c317cabc4ea35769ed6b0ab533067292a550784c20"
+    },
+    {
+      "path": "workbench/public/vendor/three.module.js",
+      "bytes": 603113,
+      "sha256": "c8211c69345d2e9949dc7a8ac969380497aa0600a5a8ac6a459c8cd02dd9cb8a"
+    },
+    {
+      "path": "workbench/server.cjs",
+      "bytes": 18828,
+      "sha256": "de71dcda4bc9f5b39d9ecd5d9a14e7d7678756dd1df4ac33415176f8e7e19e08"
+    },
+    {
+      "path": "workbench/start.ps1",
+      "bytes": 3093,
+      "sha256": "792e9451ed0cfd5fd56dd9bf85c09b842eb8ea76ae24f0dfc4a34b574d2195be"
+    },
+    {
+      "path": "workbench/state.cjs",
+      "bytes": 1672,
+      "sha256": "a9c5c6e8a56b326588f5d54c1788df708779e1f232661066b9d1edd4b7281bce"
+    },
+    {
+      "path": "workbench/terminal.cjs",
+      "bytes": 3569,
+      "sha256": "53417f08c67a4a1ebc615357828c11a1260646534f06d58a8466c7866ddbf941"
+    },
+    {
+      "path": "workbench/tests/boot-atmosphere.test.cjs",
+      "bytes": 1536,
+      "sha256": "1dd76802cefe43ecc4b035e006e89f7343caa65619f37721c1418c8f40e913fc"
+    },
+    {
+      "path": "workbench/tests/bridge-lifecycle.test.cjs",
+      "bytes": 2742,
+      "sha256": "0820b439b0903e13577a28a2b24acec0b509f26387f2a1958039608299b586ee"
+    },
+    {
+      "path": "workbench/tests/dev-tools.test.cjs",
+      "bytes": 5188,
+      "sha256": "5e89d5f8d1059ae1135547cfceacbfc0058deb651165c62c1941e4e153aadead"
+    },
+    {
+      "path": "workbench/tests/motion-v12.test.cjs",
+      "bytes": 1264,
+      "sha256": "840a35c11f6d2272b5d4d13fbb272f3af8f5ddb2686687a6b979028739d504e7"
+    },
+    {
+      "path": "workbench/tests/state.test.cjs",
+      "bytes": 1997,
+      "sha256": "e4944b5149a999be939b7a15b5c4eee9d1d2d40fe912722b7b4b5567b08f6d41"
+    },
+    {
+      "path": "workbench/tests/sync-confirmation.test.cjs",
+      "bytes": 881,
+      "sha256": "c05e2d99ee66be3be3c866956e42cb1281bda2803f9949353ad392f53741bd5b"
+    },
+    {
+      "path": "workbench/tests/workbench-features.test.cjs",
+      "bytes": 2805,
+      "sha256": "529178b08fc1772960fe34e7c74e6cb30c6bd8ba3e09920e014fddf2767adbb3"
+    }
+  ],
+  "tests": {
+    "unit": 21,
+    "publicPackageUI": "passed",
+    "sameMachineOnly": true
+  }
+}

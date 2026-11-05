@@ -1,0 +1,14 @@
+{
+  "name": "eva-codex-workbench",
+  "version": "0.3.0-preview",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "setup": "npm --prefix workbench ci",
+    "test": "node --test workbench/tests/*.test.cjs"
+  },
+  "license": "MIT"
+}
