@@ -1,11 +1,11 @@
 {
   "duration": 20,
   "sampleRate": 48000,
-  "placeholder": true,
+  "placeholder": false,
   "language": "ja-JP",
-  "engine": "silent placeholder; supply your own licensed recording",
-  "voice": null,
-  "processing": "20-second mono PCM silence",
+  "engine": "Microsoft online speech via edge-tts (generation only)",
+  "voice": "ja-JP-NanamiNeural",
+  "processing": "normalization and 10ms fades only; no ring modulation, pitch shift or bit crushing",
   "cues": [
     {
       "start": 0.35,

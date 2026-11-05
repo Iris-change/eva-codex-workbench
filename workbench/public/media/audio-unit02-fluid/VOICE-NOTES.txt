@@ -1,0 +1,1 @@
+Generic ja-JP-NanamiNeural Japanese speech, generated using Microsoft online speech through edge-tts. Original system announcement text; no actor imitation. Only the rendered WAV is played at runtime, with no online speech calls. No voice model or credentials are copied.

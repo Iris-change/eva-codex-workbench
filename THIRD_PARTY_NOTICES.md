@@ -9,3 +9,5 @@
 Dragon Codex Boot 作为原交接包的启动器参考，来源与核对范围见 PROVENANCE.md；上游 MIT 全文见 licenses/DragonCodexBoot-MIT.txt。本候选包未包含其 C# 启动器或媒体。
 
 - node-pty 1.1.0、@xterm/xterm 6.0.0、@xterm/addon-fit 0.11.0：MIT，版权全文见 workbench/licenses。npm 分发包的其他依赖许可证不删减。
+
+- 日语系统播报：Microsoft ja-JP-NanamiNeural 的原预录 WAV；所有者于 2026-11-05 确认已取得公开分发授权。音轨来源与许可边界见 workbench/public/media/audio-unit02-fluid/README.md，不将音色模型或音轨自动标为 MIT。

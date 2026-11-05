@@ -1,8 +1,8 @@
 # EVA Codex Workbench
 
-Windows 本地 Codex 工作台，红黑主题、启动动画及真实 Codex 连接。**0.3.0 预览版**，不是官方客户端，也不修改官方安装或已有桌面入口。
+Windows 本地 Codex 工作台，红黑主题、启动动画及真实 Codex 连接。**0.3.1 预览版**，不是官方客户端，也不修改官方安装或已有桌面入口。
 
-公开版保留动画结构和功能，人物图片、NERV／OpenAI 图案使用中性 SVG 占位，日语配音使用静音轨。与完整私人演示视频的外观和声音有差异，不包含原作素材包或 BGM。此目录也不包含另一个“动画后打开官方客户端”的独立启动器。
+公开版保留动画结构和功能，人物图片、NERV／OpenAI 图案使用中性 SVG 占位，系统播报使用与私人版完全相同的日语原录音。人物与图案仍与完整私人演示视频有差异，日语系统播报已恢复，不包含原作素材包或 BGM。此目录也不包含另一个“动画后打开官方客户端”的独立启动器。
 
 ## 安装与启动
 
@@ -33,4 +33,4 @@ Windows 本地 Codex 工作台，红黑主题、启动动画及真实 Codex 连�
 
 ## 许可与素材
 
-自有代码采用 MIT，Copyright (c) 2026 Iris-change，见 LICENSE。第三方原有许可证分别保留，见 THIRD_PARTY_NOTICES.md、CODE-ORIGINS.md 和 ASSETS.md；字体适用 SIL OFL。MIT 不授予 EVA 图片、商标、角色或未包含素材的权利，也不表示官方授权。
+自有代码采用 MIT，Copyright (c) 2026 Iris-change，见 LICENSE。第三方原有许可证分别保留，见 THIRD_PARTY_NOTICES.md、CODE-ORIGINS.md 和 ASSETS.md；字体适用 SIL OFL。MIT 不授予 EVA 图片、商标、角色或语音模型的权利，也不表示官方授权。系统播报按所有者已取得的分发授权提供，不自动纳入代码 MIT；见 workbench/public/media/audio-unit02-fluid/README.md。

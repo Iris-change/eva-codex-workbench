@@ -1,7 +1,7 @@
 {
   "prepared": "2026-11-05",
   "status": "public-preview",
-  "version": "0.3.0-preview",
+  "version": "0.3.1-preview",
   "files": [
     {
       "path": ".gitattributes",
@@ -15,8 +15,8 @@
     },
     {
       "path": "ASSETS.md",
-      "bytes": 632,
-      "sha256": "72fb45c13400ac06a5a7d7008c87f84455a57400b169f5016652cba8504c0e71"
+      "bytes": 874,
+      "sha256": "734bad304fea97109773d034b14513cef2ca5a4f82b8a8d1f5edf131db3afb79"
     },
     {
       "path": "CODE-ORIGINS.md",
@@ -35,8 +35,8 @@
     },
     {
       "path": "LICENSE-STATUS.md",
-      "bytes": 287,
-      "sha256": "b496f2f93e45617e324cc765122b340f13deef72b7e6903ff1f14a64f475c6c4"
+      "bytes": 332,
+      "sha256": "5402e9e918d0849dffd98b45fce0db64fe2e96a987953a9fe1cd5c9864c8471c"
     },
     {
       "path": "licenses/DragonCodexBoot-MIT.txt",
@@ -46,7 +46,7 @@
     {
       "path": "package.json",
       "bytes": 279,
-      "sha256": "af5d524feb369d5b98c629b16b46a2f76ae297a1978994b8e23a41273ecdae9c"
+      "sha256": "602c85ea1c9cb0f643049b8691b81b99d35e84add196a51debfd1b337a9cc8bb"
     },
     {
       "path": "PROVENANCE.md",
@@ -55,13 +55,13 @@
     },
     {
       "path": "PUBLIC-RELEASE-CHECKLIST.md",
-      "bytes": 920,
-      "sha256": "cc98b4ba9f7df99c05457c39180242d2dc0da5c823c11e5e10b4dbb1d6248444"
+      "bytes": 1136,
+      "sha256": "049bf40b8071cca468e963c0d34e4d4d90d2dcbce0c57d7434065b85a00be1de"
     },
     {
       "path": "README.md",
-      "bytes": 3706,
-      "sha256": "cdd78a8adc91d2013088a1388c7223b8040ef381c624d541b556a37ca45ed3a5"
+      "bytes": 3909,
+      "sha256": "4beb9a4137573fc8b13b3d0aed5948995a0f8c77691b126ab867d78674a7eb24"
     },
     {
       "path": "Start-EVA.cmd",
@@ -70,13 +70,13 @@
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
-      "bytes": 1126,
-      "sha256": "44d3fe947a4926467d909f8940de7875c1447e365280379cbaf443cce6989f47"
+      "bytes": 1390,
+      "sha256": "f67b7d6267bffde3783d51d50c50e2be0cbc7d638be1655949350e921f335ef2"
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 611,
-      "sha256": "78cdf7b4bc410dda026d0b135a12876760fad9fb21750738a6aeb7d5e8c059af"
+      "bytes": 872,
+      "sha256": "46241ebab7b074c16f0ff089a7e1c05752e15ba790c80938e89b76bb3989ba51"
     },
     {
       "path": "workbench/attachments.cjs",
@@ -121,12 +121,12 @@
     {
       "path": "workbench/package-lock.json",
       "bytes": 1750,
-      "sha256": "c1800180991a5542f41b948e802ec7989f7ddf7390b42b932fe335f78f13d9cf"
+      "sha256": "7cf6cbc8124a744f20ff2bb896e3af8cb87a3db2c97d33bd2f9b9c2200764b65"
     },
     {
       "path": "workbench/package.json",
       "bytes": 340,
-      "sha256": "7fcedf7d8c012671d5115dff947bcc356d325a71a887d14626db4892342fb995"
+      "sha256": "575e7ced683dfe6dc512c5c00504ff5aa71e9a66380b1c094f2db9bed8a5990b"
     },
     {
       "path": "workbench/plugins.cjs",
@@ -214,14 +214,24 @@
       "sha256": "3ff03d9c542170b0d4602b6090b47e2f419b6ef457393b683b5385cdbedf32a0"
     },
     {
+      "path": "workbench/public/media/audio-unit02-fluid/README.md",
+      "bytes": 955,
+      "sha256": "3ab5a200aa81e529c839cf749103634bb9db0413aefff4135e50fe07a4a3dfef"
+    },
+    {
       "path": "workbench/public/media/audio-unit02-fluid/timeline.json",
-      "bytes": 1007,
-      "sha256": "ddce42bb366ae377322be704c5f739acfe5ec09172ca36256b3e3e6bffb628da"
+      "bytes": 1125,
+      "sha256": "fdb087d8edcb465603757f27bed0d25d682448d8290f63ef6e20b156c40bd684"
+    },
+    {
+      "path": "workbench/public/media/audio-unit02-fluid/VOICE-NOTES.txt",
+      "bytes": 273,
+      "sha256": "5c888276e91e8797a3f134cca8003f63f11975fc515e85662b9a1b2ae5c6ba8e"
     },
     {
       "path": "workbench/public/media/audio-unit02-fluid/voice.wav",
       "bytes": 1920044,
-      "sha256": "d85c8af3ff68fa7dec3d39d1b430293752de59f30da354b7ab30ea2be6c1c5f5"
+      "sha256": "ce8834f8cdf8e93d676a0264a704912257d87e87194f10c288a20c8388a345d2"
     },
     {
       "path": "workbench/public/media/eva/nerv-mark.svg",
@@ -321,7 +331,7 @@
     {
       "path": "workbench/server.cjs",
       "bytes": 18828,
-      "sha256": "de71dcda4bc9f5b39d9ecd5d9a14e7d7678756dd1df4ac33415176f8e7e19e08"
+      "sha256": "9786817fcc919414e585c1a9f5abd4a7a26017848638c077eb2e3fbca1e9a247"
     },
     {
       "path": "workbench/start.ps1",
@@ -337,6 +347,11 @@
       "path": "workbench/terminal.cjs",
       "bytes": 3569,
       "sha256": "53417f08c67a4a1ebc615357828c11a1260646534f06d58a8466c7866ddbf941"
+    },
+    {
+      "path": "workbench/tests/audio-announcements.test.cjs",
+      "bytes": 1701,
+      "sha256": "182426a896cf4ca0d281a95e7eedbc3670615788f80863080359bab227ca1f21"
     },
     {
       "path": "workbench/tests/boot-atmosphere.test.cjs",
@@ -375,8 +390,10 @@
     }
   ],
   "tests": {
-    "unit": 21,
+    "unit": 22,
     "publicPackageUI": "passed",
-    "sameMachineOnly": true
+    "sameMachineOnly": true,
+    "publicAudioUI": "passed",
+    "originalVoiceUnmodified": true
   }
 }
