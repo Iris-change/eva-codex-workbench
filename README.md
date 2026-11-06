@@ -4,7 +4,136 @@ Windows / macOS 本地 Codex 工作台，红黑主题、启动动画及真实 Co
 
 公开版保留动画结构和功能，人物图片、NERV／OpenAI 图案使用中性 SVG 占位，系统播报使用与私人版完全相同的日语原录音。人物与图案仍与完整私人演示视频有差异，日语系统播报已恢复，不包含原作素材包或 BGM。此目录也不包含另一个“动画后打开官方客户端”的独立启动器。
 
-## 安装与启动
+## macOS 原生版（Codex + Claude Code 双后端）
+
+`native-macos/` 是 Swift / AppKit 编写的原生桌面应用 **EVA Workbench.app**（0.9.1），界面不使用 WebKit；后端仍是 `workbench/` 中的本地 Node 服务，同时驱动官方 Codex app-server 和官方 Claude Code（`@anthropic-ai/claude-agent-sdk` 随附的 CLI）。
+
+主要功能：
+
+- 一个窗口里同时使用 Codex 和 Claude Code；Claude Code 提供只读 / 写入（逐次确认）/ 完全访问三档权限，空闲会话可直接切换。
+- 读取本机 Codex、Claude 桌面版和 Claude Code CLI 的历史会话；继续历史会话时创建 EVA 分支，原记录不改。
+- 在当前对话里切换助手继续（Codex ⇄ Claude Code）：标题不变，历史作为参考转交，权限重置为只读，发送前可撤销。
+- 重复会话可合并收起，本机历史可只在 EVA 中归档，均可恢复；官方记录不改动。
+- 通用附件：多选、粘贴、拖入；PDF、Word（docx / doc）、RTF、Excel、PPT、OpenDocument 提取文字；图片转为可识图格式（多页 TIFF / 动图会标明只发送第 1 页 / 帧）。
+- 上下文、5 小时和每周用量小组件；红黑 / 红白 / 跟随系统主题。
+- 与网页版相同的约 20 秒开场（明朝体、LCL、同步率 99.2% 确认、日文播报与中文字幕），亮色 / 暗色各一套；Esc 跳过，“显示”菜单可关闭。
+- 输入框回车发送，Shift + 回车换行；输入法选字时回车只确认候选词。
+
+### 安装
+
+需要：macOS 13.3+（Apple Silicon）、Node.js 20+（位于 `/opt/homebrew/bin` 或 `/usr/local/bin`）、Xcode 或 Apple 命令行工具（`xcode-select --install`）、官方 Codex CLI（若装有 ChatGPT 桌面版，会优先使用其中自带的 codex）。
+
+```bash
+git clone <本仓库地址> eva-codex-workbench
+cd eva-codex-workbench
+./Install-Native-macOS.command      # 或：npm run install:native
+```
+
+安装脚本会：把 `workbench/` 复制到 `~/Library/Application Support/EVA-Workbench/workbench/`（**不触碰其中的 `data/`**）并执行 `npm ci`；用 `native-macos/build-app.py` 编译、自检并 ad-hoc 签名应用；安装到 `~/Applications/EVA Workbench.app`（旧版改名为 `.previous`）。只想编译可运行 `npm run build:native`，产物在 `build-native/`。
+
+首次让 Claude Code 读取“文稿”“桌面”等目录中的项目时，macOS 会询问是否允许访问，点“允许”即可。ad-hoc 签名在每次重新编译后会变化，系统可能会再问一次。
+
+### 连接 Codex
+
+1. 终端运行 `codex login`，用自己的账号登录（也可以在应用左下角点“登录”）。
+2. 打开应用，Codex 连接状态显示“已连接”后即可新建对话。
+3. 应用按以下顺序查找 codex：ChatGPT 桌面版自带的 CLI → 环境变量 `HACKCLAW_CODEX` → `PATH` 中的 `codex`。`CODEX_HOME` 照常生效。
+
+### 连接 Claude Code
+
+Claude Code 通过随附的官方 CLI **直接连接** Anthropic，不需要额外代理或沙箱：
+
+1. 在应用里切到 “Claude Code”，点左下角“登录”，会打开终端运行官方的 `claude auth login`（即仓库根目录的 `Claude-Login.command`）；按提示在浏览器完成登录后回到应用点“刷新”。
+2. 也可以手动登录 / 查看状态（Intel Mac 把 `arm64` 换成 `x64`）：
+
+   ```bash
+   CLAUDE="$HOME/Library/Application Support/EVA-Workbench/workbench/node_modules/@anthropic-ai/claude-agent-sdk-darwin-arm64/claude"
+   "$CLAUDE" auth login
+   "$CLAUDE" auth status
+   ```
+
+3. 想改用自己安装的 Claude Code，设置 `EVA_CLAUDE=/绝对路径/claude`。
+4. 如需代理：服务会原样沿用 `HTTPS_PROXY` / `HTTP_PROXY` / `NO_PROXY` 等环境变量，不强制、不改写。注意从 Finder 启动的应用不会继承终端里的变量，可用 `launchctl setenv HTTPS_PROXY http://host:port` 后重开应用，或在终端直接运行 `"$HOME/Applications/EVA Workbench.app/Contents/MacOS/eva-workbench"`。
+5. 权限：只读模式只开放 Read / Glob / Grep；写入模式限所选项目，命令与写入逐次确认；完全访问使用官方 `bypassPermissions`，需要在界面中明确确认。
+
+### 本地接口
+
+服务只监听 `http://127.0.0.1:43137`（`Host` 必须是 `127.0.0.1:端口`）。调用方式：
+
+1. `GET /native-session` 取得 `unit02_session` Cookie（网页版打开 `/` 时也会设置）。
+2. 之后所有 `/api/*` 请求带上该 Cookie；`POST` 还必须带 `Origin: http://127.0.0.1:43137` 和 `Content-Type: application/json`，请求体是 JSON。
+3. 出错时返回 `{"error": "原因"}`。
+
+```python
+import json, urllib.request
+base = "http://127.0.0.1:43137"
+opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))   # 本机地址不要走代理
+cookie = opener.open(base + "/native-session").headers["Set-Cookie"].split(";")[0]
+def api(route, body=None):
+    req = urllib.request.Request(base + route, data=None if body is None else json.dumps(body).encode(),
+                                 headers={"Cookie": cookie, "Origin": base, "Content-Type": "application/json"})
+    return json.load(opener.open(req))
+state = api("/api/state")
+project = api("/api/project", {"path": "/Users/me/code/demo"})
+thread = api("/api/thread", {"provider": "claude", "projectId": project["id"], "mode": "read-only"})
+api("/api/send", {"threadId": thread["id"], "text": "总结这个项目的结构"})
+```
+
+| 方法与路径 | 参数 | 说明 |
+| --- | --- | --- |
+| `GET /health` | — | 不需要 Cookie；返回 `{app, version}`，用于检测服务 |
+| `GET /native-session` | — | 设置会话 Cookie |
+| `GET /api/state` | — | 完整状态：项目、会话、连接、账号、模型、用量、待确认请求 |
+| `GET /api/events` | — | Server-Sent Events，每次状态变化推送完整快照 |
+| `POST /api/project` | `path`（绝对路径） | 添加项目，返回 `{id, name, path}` |
+| `POST /api/pick-folder` | — | 弹出系统文件夹选择框 |
+| `POST /api/thread` | `provider`（`codex` / `claude`）、`projectId`、`mode`、`model`、`effort`、`confirmFullAccess` | 新建会话；`mode` 为 `read-only` / `workspace-write`，Claude 另有 `full-access`（需 `confirmFullAccess: true`） |
+| `POST /api/send` | `threadId`、`text`、`attachments`（附件 id 数组）、`model`、`effort` | 发送一轮消息；结果通过 `/api/state` 或 `/api/events` 查看 |
+| `POST /api/cancel` | `threadId` | 停止当前任务 |
+| `POST /api/approval` | `id`、`accept`、`answers` | 回应命令 / 文件写入 / 提问类授权请求 |
+| `POST /api/thread/mode` | `threadId`、`mode`、`confirmFullAccess` | 空闲时切换权限，下一次发送生效 |
+| `POST /api/thread/rename` | `threadId`、`title` | 重命名（1–100 字） |
+| `POST /api/thread/archive` | `threadId`、`archived` | 归档 / 恢复；本机历史只在 EVA 中隐藏 |
+| `POST /api/thread/transfer` | `threadId`、`targetProvider`、`inPlace`、`recent` | 换另一助手继续；`inPlace: true` 为就地切换，`recent: true` 只带最近 200 条 |
+| `POST /api/thread/transfer/undo` | `threadId` | 撤销尚未发送过消息的就地切换 |
+| `POST /api/thread/merge` | `threadId`、`intoThreadId`（`null` 为取消合并） | 把重复会话收起到保留的会话下 |
+| `POST /api/history/sync` | — | 重新扫描本机 Codex / Claude 历史 |
+| `POST /api/history/read` | `threadId`、`older` | 读取历史正文，`older: true` 向前翻页 |
+| `POST /api/history/continue` | `threadId`、`mode`、`model`、`effort` | 从历史创建可续聊的 EVA 分支 |
+| `POST /api/attachment` | `name` + `dataBase64`（任意文件）或 `dataUrl`（PNG / JPEG）；可选 `textPreview`、`previewTruncated`、`frames` | 上传附件，返回 `{id, kind, readability, …}`；单个文件 ≤ 32 MB |
+| `GET /api/attachment-info?id=` | `id` | 附件信息与提取出的文字预览 |
+| `GET /api/attachment/<id>` | — | 下载附件原文件 |
+| `GET /api/files?projectId=&path=` | — | 列出项目目录（不显示 `.env`、`node_modules` 等） |
+| `GET /api/file?projectId=&path=` | — | 读取 ≤ 512 KB 的文本文件 |
+| `POST /api/usage/refresh` | `provider`、`threadId` | 刷新用量信息 |
+| `POST /api/login` / `POST /api/refresh-account` / `POST /api/reconnect` | `provider` | 登录、刷新账号、重新连接 |
+| `POST /api/dev/<操作>` | `projectId` 等 | 终端：`terminal-list` / `terminal-create` / `terminal-input` / `terminal-resize` / `terminal-close`（输出用 `GET /api/dev/terminal-events?id=`）；Git：`git-status` / `git-diff` / `git-action`；插件：`plugins-list` / `plugins-change` |
+| `POST /api/shutdown` | — | 保存状态并结束服务 |
+
+### 环境变量与参数
+
+| 名称 | 作用 |
+| --- | --- |
+| `EVA_DESKTOP_PORT` | 原生应用使用的端口（默认 43137） |
+| `EVA_DESKTOP_DATA_DIR` | 原生应用使用的数据目录（默认支持目录下的 `workbench/data`） |
+| `HACKCLAW_PORT` / `HACKCLAW_DATA_DIR` | 直接运行 `node workbench/server.cjs` 时的端口和数据目录 |
+| `HACKCLAW_CODEX` | 指定 codex 可执行文件 |
+| `EVA_CLAUDE` | 指定 Claude Code 可执行文件 |
+| `CODEX_HOME` | 官方 Codex 配置目录 |
+| `eva-workbench --self-test` | 原生端自检（构建时自动运行） |
+| `eva-workbench --render-intro <目录>` | 不开窗口，把开场的关键帧（亮色 / 暗色）导出为 PNG |
+
+应用偏好保存在 `defaults read local.eva.dual-workbench`：`native.theme`（`system` / `dark` / `light`）、`native.introEnabled`、`native.introSound`。日志在 `~/Library/Logs/EVA-Workbench.log`，会话数据在 `~/Library/Application Support/EVA-Workbench/workbench/data`，不要上传或提交。
+
+### 测试
+
+```bash
+npm run setup
+npm test     # 后端与原生启动器测试
+npm run build:native   # 编译原生应用并运行自检
+```
+
+## 网页版安装与启动
 
 ### Windows
 

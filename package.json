@@ -9,7 +9,9 @@
   "scripts": {
     "setup": "npm --prefix workbench ci",
     "start:mac": "node workbench/start-macos.cjs",
-    "test": "node --test workbench/tests"
+    "test": "node workbench/run-tests.cjs",
+    "install:native": "bash Install-Native-macOS.command",
+    "build:native": "python3 -I native-macos/build-app.py build-native"
   },
   "license": "MIT"
 }
