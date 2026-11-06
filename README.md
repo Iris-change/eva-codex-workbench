@@ -6,7 +6,7 @@ Windows / macOS 本地 Codex 工作台，红黑主题、启动动画及真实 Co
 
 ## macOS 原生版（Codex + Claude Code 双后端）
 
-`native-macos/` 是 Swift / AppKit 编写的原生桌面应用 **EVA Workbench.app**（0.10.1），界面不使用 WebKit；后端仍是 `workbench/` 中的本地 Node 服务，同时驱动官方 Codex app-server 和官方 Claude Code（`@anthropic-ai/claude-agent-sdk` 随附的 CLI）。
+`native-macos/` 是 Swift / AppKit 编写的原生桌面应用 **EVA Workbench.app**（0.10.2），界面不使用 WebKit；后端仍是 `workbench/` 中的本地 Node 服务，同时驱动官方 Codex app-server 和官方 Claude Code（`@anthropic-ai/claude-agent-sdk` 随附的 CLI）。
 
 主要功能：
 

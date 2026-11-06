@@ -258,6 +258,8 @@ struct Entry {
             precondition(string(object(["id": "a"])["id"]) == "a")
             precondition(messageText("# Heading\n```swift\nlet x = 1\n```\nBody").string.contains("let x = 1"))
             precondition(!messageText("<script>example</script>").string.isEmpty)
+            let withFiles = MessageCard(message: ["role": "user", "text": "看看这张照片", "attachments": [["id": "a", "name": "IMG_0001-a-very-long-photo-name.HEIC", "mime": "image/png"], ["id": "b", "name": "report.pdf", "mime": "application/octet-stream"]]], provider: "claude")
+            precondition(withFiles.attachments.arrangedSubviews.count == 2, "messages with attachments must render")
             let md = messageText("## 标题\n**粗体** 与 `code` 和 [链接](https://example.com)\n- 列表项\n1. 第一\n> 引用\n| A | B |\n|---|---|\n| 1 | 2 |").string
             precondition(!md.contains("**") && !md.contains("`") && !md.contains("](") && !md.contains("## ") && !md.contains("|---") && md.contains("•") && md.contains("1.") && md.contains("A\tB"), "Markdown must render, not show source: \(md)")
             let client = NativeAPI(port: 43137); precondition(client.origin == "http://127.0.0.1:43137")

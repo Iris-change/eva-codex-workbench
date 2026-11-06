@@ -23,7 +23,7 @@ for size in [16,32,128,256,512]:
   name='icon_'+str(size)+'x'+str(size)+('@2x' if scale==2 else '')+'.png'
   subprocess.run(['sips','-z',str(size*scale),str(size*scale),str(icon),'--out',str(iconset/name)],capture_output=True,check=True)
 subprocess.run(['iconutil','-c','icns',str(iconset),'-o',str(app/'Contents/Resources/AppIcon.icns')],check=True)
-info={'CFBundleName':'EVA Workbench','CFBundleDisplayName':'EVA Workbench','CFBundleIdentifier':'local.eva.dual-workbench','CFBundleExecutable':'eva-workbench','CFBundleIconFile':'AppIcon','CFBundlePackageType':'APPL','CFBundleShortVersionString':'0.10.1','CFBundleVersion':'0.10.1','LSMinimumSystemVersion':'13.3','LSApplicationCategoryType':'public.app-category.developer-tools','NSHighResolutionCapable':True,'NSAppTransportSecurity':{'NSAllowsLocalNetworking':True},'NSHumanReadableCopyright':'Native Swift/AppKit EVA Workbench. Based on EVA Codex Workbench (MIT).'}
+info={'CFBundleName':'EVA Workbench','CFBundleDisplayName':'EVA Workbench','CFBundleIdentifier':'local.eva.dual-workbench','CFBundleExecutable':'eva-workbench','CFBundleIconFile':'AppIcon','CFBundlePackageType':'APPL','CFBundleShortVersionString':'0.10.2','CFBundleVersion':'0.10.2','LSMinimumSystemVersion':'13.3','LSApplicationCategoryType':'public.app-category.developer-tools','NSHighResolutionCapable':True,'NSAppTransportSecurity':{'NSAllowsLocalNetworking':True},'NSHumanReadableCopyright':'Native Swift/AppKit EVA Workbench. Based on EVA Codex Workbench (MIT).'}
 (app/'Contents/Info.plist').write_bytes(plistlib.dumps(info))
 # Generated graphics can inherit Finder metadata in Documents; it is not code-signable.
 for attribute in ('com.apple.FinderInfo','com.apple.ResourceFork'):

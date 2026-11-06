@@ -18,7 +18,7 @@ let state={projects:[],threads:[]},account={signedIn:false,type:null},models=[],
 fs.mkdirSync(DATA,{recursive:true});
 try{state=JSON.parse(fs.readFileSync(path.join(DATA,'state.json'),'utf8'))}catch(e){if(e.code!=='ENOENT')throw Error('Cannot load local history; original file preserved: '+e.message)}
 for(const t of state.threads){if(t.activeTurn||t.status==='inProgress'){t.activeTurn=null;t.status='interrupted';t.error='工作台上次关闭时任务未完成，请确认文件状态后重试。'}}
-function snapshot(){return {...state,connection,connectionError,account,models,usage,approvals:[...approvals.values()],providers:{claude:claude.status},localHistory:history.summary,version:'0.10.1-native'}}
+function snapshot(){return {...state,connection,connectionError,account,models,usage,approvals:[...approvals.values()],providers:{claude:claude.status},localHistory:history.summary,version:'0.10.2-native'}}
 function persist(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{const tmp=path.join(DATA,'state.tmp');fs.writeFileSync(tmp,JSON.stringify(storedState(state)));fs.renameSync(tmp,path.join(DATA,'state.json'))}catch(e){connectionError='History save failed: '+e.message;notify()}},200)}
 function notify(){if(notifyTimer)return;notifyTimer=setTimeout(()=>{notifyTimer=null;const s='data: '+JSON.stringify(snapshot())+'\n\n';for(const client of subscribers)client.write(s)},40)}
 function changed(){persist();notify()}
@@ -158,11 +158,11 @@ const server=http.createServer(async(req,res)=>{
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');
   res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'self'; style-src 'self' 'nonce-${terminalStyleNonce}'; img-src 'self' data:; connect-src 'self'; media-src 'self'; frame-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'`);
   const u=new URL(req.url,ORIGIN);
-  if(u.pathname==='/health'){json(res,{app:'EVA-UNIT02',version:'0.10.1-native'});return}
+  if(u.pathname==='/health'){json(res,{app:'EVA-UNIT02',version:'0.10.2-native'});return}
   if(u.pathname==='/native-session'){
     if(req.method!=='GET'){json(res,{error:'Method not allowed'},405);return}
     res.setHeader('Set-Cookie',`unit02_session=${token}; HttpOnly; SameSite=Strict; Path=/`);
-    json(res,{app:'EVA-UNIT02',version:'0.10.1-native'});return;
+    json(res,{app:'EVA-UNIT02',version:'0.10.2-native'});return;
   }
   if(u.pathname.startsWith('/api/')){
     if(!req.headers.cookie?.split(';').map(x=>x.trim()).includes('unit02_session='+token)){json(res,{error:'Open the workbench first'},403);return}

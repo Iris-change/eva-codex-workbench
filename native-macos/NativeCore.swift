@@ -275,9 +275,11 @@ final class MessageCard: NSView {
             for file in files {
                 let id = string(file["id"]); images[id] = file
                 let button = EVATheme.button((string(file["mime"]).hasPrefix("image/") ? "▧ " : "▤ ") + string(file["name"]), target: self, action: #selector(openImage))
-                button.cell?.lineBreakMode = .byTruncatingMiddle; button.widthAnchor.constraint(lessThanOrEqualTo: attachments.widthAnchor).isActive = true
-                button.identifier = NSUserInterfaceItemIdentifier(id)
+                button.cell?.lineBreakMode = .byTruncatingMiddle; button.identifier = NSUserInterfaceItemIdentifier(id)
+                // Add to the stack before constraining against it: a constraint between views without a common
+                // ancestor throws and terminated the app whenever a message with attachments was shown.
                 attachments.addArrangedSubview(button)
+                button.widthAnchor.constraint(lessThanOrEqualTo: attachments.widthAnchor).isActive = true
             }
         }
         attachments.isHidden = files.isEmpty

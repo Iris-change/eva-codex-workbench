@@ -121,10 +121,12 @@ final class EVAButton: NSButton {
             title.draw(at: NSPoint(x: 18, y: 32), withAttributes: [.font: titleFont, .foregroundColor: text])
             return
         }
-        let attributes: [NSAttributedString.Key: Any] = [.font: titleFont, .foregroundColor: text]
-        let size = (title as NSString).size(withAttributes: attributes)
-        let x = leftAligned ? 15 : (r.width - size.width - (trailing == nil ? 0 : 22)) / 2
-        title.draw(at: NSPoint(x: x, y: (r.height - size.height) / 2), withAttributes: attributes)
+        let style = NSMutableParagraphStyle(); style.lineBreakMode = .byTruncatingMiddle
+        let attributes: [NSAttributedString.Key: Any] = [.font: titleFont, .foregroundColor: text, .paragraphStyle: style]
+        let pad: CGFloat = kind == .ghost ? 8 : 12, available = max(10, r.width - pad * 2 - (trailing == nil ? 0 : 22))
+        var size = (title as NSString).size(withAttributes: attributes); size.width = min(size.width, available)
+        let x = leftAligned ? 15 : max(pad, (r.width - size.width - (trailing == nil ? 0 : 22)) / 2)
+        (title as NSString).draw(in: NSRect(x: x, y: (r.height - size.height) / 2, width: size.width + 1, height: size.height), withAttributes: attributes)
         if let trailing {
             let mark = NSAttributedString(string: trailing, attributes: [.font: EVAStyle.ui(15), .foregroundColor: kind == .primary ? EVAStyle.onRed.withAlphaComponent(0.85) : text])
             let markSize = mark.size(); mark.draw(at: NSPoint(x: leftAligned ? r.width - markSize.width - 14 : x + size.width + 8, y: (r.height - markSize.height) / 2))
