@@ -6,6 +6,9 @@ import CoreText
 // NERV boot → LCL fill → pilot synchronisation (holds at 99.2 % for confirmation) → partition
 // rewrite into "connecting" → hand-off to the real workbench. Drawn with CoreGraphics; no WebKit.
 
+/// Reads a boolean preference that defaults to on; accepts YES/NO/1/0 from the command-line argument domain too.
+func introFlag(_ key: String) -> Bool { UserDefaults.standard.object(forKey: key) == nil ? true : UserDefaults.standard.bool(forKey: key) }
+
 enum IntroTiming {
     static let duration = 20.0, lclStart = 3.0, lclEnd = 6.4, lclClearStart = 6.8, lclClearEnd = 9.2
     static let syncStart = 8.8, syncFull = 14.1, hold = 13.3, transferStart = 14.35, transferEnd = 15.45
@@ -322,7 +325,7 @@ final class IntroConfirmCard: NSView {
 final class IntroView: NSView {
     var onFinish: (() -> Void)?
     var isConnected: () -> Bool = { false }
-    var soundEnabled: Bool { UserDefaults.standard.object(forKey: "native.introSound") as? Bool ?? true }
+    var soundEnabled: Bool { introFlag("native.introSound") }
     private var timer: Timer?, player: AVAudioPlayer?, clockStart = CACurrentMediaTime(), time = 0.0, held = false, interactive = true, finished = false
     private var workbench: CGImage?, cachedScale: CGFloat = 2
     private let card = IntroConfirmCard(), skip = IntroButton(), sound = IntroButton()

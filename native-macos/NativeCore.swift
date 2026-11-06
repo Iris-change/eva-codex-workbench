@@ -33,11 +33,7 @@ enum EVATheme {
         return label
     }
     static func button(_ title: String, target: AnyObject?, action: Selector?, primary: Bool = false) -> NSButton {
-        let button = NSButton(title: title, target: target, action: action)
-        button.bezelStyle = .rounded
-        button.font = .systemFont(ofSize: 12, weight: primary ? .semibold : .regular)
-        if primary { button.bezelColor = red; button.contentTintColor = .white }
-        return button
+        EVAButton(title, kind: primary ? .primary : .outline, target: target, action: action)
     }
     static func vertical(_ views: [NSView] = [], spacing: CGFloat = 10) -> NSStackView {
         let stack = NSStackView(views: views)
@@ -189,7 +185,7 @@ final class ComposerView: NSTextView {
     }
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
-        if string.isEmpty { (placeholder as NSString).draw(at: NSPoint(x: 10, y: 11), withAttributes: [.font: NSFont.systemFont(ofSize: 14), .foregroundColor: EVATheme.muted]) }
+        if string.isEmpty { (placeholder as NSString).draw(at: NSPoint(x: textContainerInset.width + (textContainer?.lineFragmentPadding ?? 5), y: textContainerInset.height), withAttributes: [.font: font ?? NSFont.systemFont(ofSize: 14), .foregroundColor: EVAStyle.faint]) }
     }
     override func didChangeText() { super.didChangeText(); needsDisplay = true }
 }
@@ -198,17 +194,13 @@ final class EVAFrame: NSView {
     var showGrid = false
     override func viewDidChangeEffectiveAppearance() { super.viewDidChangeEffectiveAppearance(); needsDisplay = true }
     override func draw(_ dirtyRect: NSRect) {
-        EVATheme.background.setFill(); bounds.fill()
+        EVAStyle.base.setFill(); bounds.fill()
         if showGrid {
             NSColor(calibratedWhite: 0.16, alpha: 0.22).setStroke()
             let grid = NSBezierPath(); grid.lineWidth = 0.5
             for x in stride(from: CGFloat(0), through: bounds.width, by: 42) { grid.move(to: NSPoint(x: x, y: 0)); grid.line(to: NSPoint(x: x, y: bounds.height)) }
             for y in stride(from: CGFloat(0), through: bounds.height, by: 42) { grid.move(to: NSPoint(x: 0, y: y)); grid.line(to: NSPoint(x: bounds.width, y: y)) }
             grid.stroke()
-        }
-        EVATheme.orange.withAlphaComponent(0.7).setFill()
-        for x in stride(from: CGFloat(0), through: bounds.width, by: 24) {
-            let stripe = NSBezierPath(); stripe.move(to: NSPoint(x: x, y: bounds.height - 3)); stripe.line(to: NSPoint(x: x + 11, y: bounds.height - 3)); stripe.line(to: NSPoint(x: x + 15, y: bounds.height)); stripe.line(to: NSPoint(x: x + 4, y: bounds.height)); stripe.close(); stripe.fill()
         }
     }
 }
@@ -228,35 +220,16 @@ final class ThemedStack: NSStackView {
 
 final class EVARow: NSTableRowView {
     override func drawSelection(in dirtyRect: NSRect) {
-        EVATheme.red.withAlphaComponent(isEmphasized ? 0.65 : 0.35).setFill()
-        NSBezierPath(roundedRect: bounds.insetBy(dx: 1, dy: 1), xRadius: 4, yRadius: 4).fill()
+        EVAStyle.selected.setFill(); bounds.insetBy(dx: 0, dy: 1).fill()
+        EVAStyle.red.setFill(); NSRect(x: 0, y: 1, width: 3, height: bounds.height - 2).fill()
+        EVAStyle.red.withAlphaComponent(0.55).setStroke(); let edge = NSBezierPath(rect: bounds.insetBy(dx: 0.5, dy: 1.5)); edge.lineWidth = 1; edge.stroke()
     }
-}
-
-func messageText(_ value: String) -> NSAttributedString {
-    let output = NSMutableAttributedString()
-    let paragraph = NSMutableParagraphStyle(); paragraph.lineSpacing = 5; paragraph.paragraphSpacing = 5
-    var code = false
-    for line in value.components(separatedBy: "\n") {
-        if line.hasPrefix("```") { code.toggle(); continue }
-        var text = line
-        var font = NSFont.systemFont(ofSize: 14)
-        var color = EVATheme.cream
-        if code { font = .monospacedSystemFont(ofSize: 12, weight: .regular); color = EVATheme.codeText }
-        else if line.hasPrefix("#") {
-            let prefix = line.prefix(while: { $0 == "#" }).count
-            text = String(line.dropFirst(prefix)).trimmingCharacters(in: .whitespaces)
-            font = .systemFont(ofSize: max(15, 21 - CGFloat(prefix)), weight: .semibold)
-        }
-        let fragment = NSMutableAttributedString(string: text + "\n", attributes: [.font: font, .foregroundColor: color, .paragraphStyle: paragraph])
-        if code { fragment.addAttribute(.backgroundColor, value: EVATheme.codeBackground, range: NSRange(location: 0, length: fragment.length)) }
-        output.append(fragment)
-    }
-    return output
 }
 
 final class MessageCard: NSView {
     var bubbleColor: NSColor = EVATheme.assistantBubble
+    var isUser = false
+    override func draw(_ dirtyRect: NSRect) { EVAStyle.sessionRule.setFill(); NSRect(x: 0, y: 0, width: bounds.width, height: 1).fill(); if isUser { EVAStyle.red.withAlphaComponent(0.8).setFill(); NSRect(x: 0, y: 20, width: 2, height: max(0, bounds.height - 40)).fill() } }
     let body = NSTextField(wrappingLabelWithString: "")
     let role = EVATheme.label("", size: 10, color: EVATheme.orange, weight: .semibold)
     let attachments = NSStackView()
@@ -267,22 +240,23 @@ final class MessageCard: NSView {
     init(message: JSON, provider: String) {
         super.init(frame: .zero)
         wantsLayer = true
-        bubbleColor = string(message["role"]) == "user" ? EVATheme.userBubble : EVATheme.assistantBubble
-        layer?.borderWidth = 1
+        // Flat transcript rows as in the web workbench: translucent base, small mono role line, hairline separator.
+        isUser = string(message["role"]) == "user"
+        bubbleColor = EVAStyle.base.withAlphaComponent(0.86)
+        role.font = EVAStyle.mono(9, .medium); role.textColor = isUser ? EVAStyle.dyn("userRole", 0xb0bbc0, 0x5f7079) : EVAStyle.orange
         updateAppearance()
-        layer?.cornerRadius = 7
-        body.isSelectable = true
+        body.isSelectable = true; body.allowsEditingTextAttributes = true
         body.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         attachments.orientation = .vertical; attachments.alignment = .leading; attachments.spacing = 7
         let stack = EVATheme.vertical([role, body, attachments], spacing: 8)
         attachments.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
         stack.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stack)
-        NSLayoutConstraint.activate([stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16), stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16), stack.topAnchor.constraint(equalTo: topAnchor, constant: 14), stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -14), body.widthAnchor.constraint(equalTo: stack.widthAnchor)])
+        NSLayoutConstraint.activate([stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 18), stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -18), stack.topAnchor.constraint(equalTo: topAnchor, constant: 22), stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -22), body.widthAnchor.constraint(equalTo: stack.widthAnchor)])
         update(message: message, provider: provider, width: 700)
     }
     required init?(coder: NSCoder) { fatalError() }
-    func updateAppearance() { effectiveAppearance.performAsCurrentDrawingAppearance { layer?.backgroundColor = bubbleColor.cgColor; layer?.borderColor = EVATheme.border.cgColor }; body.needsDisplay = true }
+    func updateAppearance() { effectiveAppearance.performAsCurrentDrawingAppearance { layer?.backgroundColor = bubbleColor.cgColor; layer?.borderWidth = 0; layer?.cornerRadius = 0 }; needsDisplay = true; body.needsDisplay = true }
     override func viewDidChangeEffectiveAppearance() { super.viewDidChangeEffectiveAppearance(); updateAppearance() }
     func update(message: JSON, provider: String, width: CGFloat) {
         let source = string(message["sourceProvider"]).isEmpty ? provider : string(message["sourceProvider"])

@@ -57,43 +57,45 @@ final class NativeWorkbench: NSObject, NSApplicationDelegate, NSWindowDelegate, 
     var usageTimer: Timer?, usageRefreshing = false
     var usageErrors: [String: String] = [:]
     let usagePopover = NSPopover()
-    let usageButton = NSButton()
+    let usageButton = EVAButton()
     let contextMetric = UsageMetric(), fiveHourMetric = UsageMetric(), weekMetric = UsageMetric()
     let usageSourceLabel = NSTextField(wrappingLabelWithString: "")
-    let usageRefreshButton = NSButton()
-    let themePicker = NSPopUpButton(frame: .zero, pullsDown: false)
+    let usageRefreshButton = EVAButton()
+    let themePicker = EVAPopUp(frame: .zero, pullsDown: false)
 
     let sidebarTable = NSTableView()
     let search = NSSearchField()
-    let projectPicker = NSPopUpButton(frame: .zero, pullsDown: false)
-    let syncButton = NSButton(), archiveButton = NSButton(), accountButton = NSButton()
+    let projectPicker = EVAPopUp(frame: .zero, pullsDown: false)
+    let syncButton = EVAButton(), archiveButton = EVAButton(), accountButton = EVAButton()
+    let sessionCountLabel = EVAStyle.label("00", EVAStyle.mono(10), EVAStyle.sub)
+    let modeBadge = EVAButton(), footer = StatusFooter(), backdrop = Backdrop()
     let syncLabel = EVATheme.label("正在连接本机服务…", size: 10, color: EVATheme.muted)
     let accountLabel = EVATheme.label("", size: 11, color: EVATheme.muted)
-    let providerPicker = NSSegmentedControl(labels: ["Codex", "Claude Code"], trackingMode: .selectOne, target: nil, action: nil)
+    let providerPicker = EVASegmented(labels: ["Codex", "Claude Code"], trackingMode: .selectOne, target: nil, action: nil)
     let projectLabel = EVATheme.label("PROJECT / 未选择项目", size: 11, color: EVATheme.muted)
     let titleLabel = EVATheme.label("新对话", size: 24, weight: .semibold)
     let connectionLabel = EVATheme.label("● CONNECTING", size: 11, color: EVATheme.orange)
     let taskLabel = EVATheme.label("准备中…", size: 11, color: EVATheme.muted)
     let noticeLabel = EVATheme.label("", size: 12, color: EVATheme.orange)
     let historyLabel = NSTextField(wrappingLabelWithString: "")
-    let historyContinue = NSButton(), historyEarlier = NSButton(), historyOriginal = NSButton(), historyUndo = NSButton(), historyNext = NSButton(), historyUnmerge = NSButton()
-    let transferButton = NSButton(), transferPreviewButton = NSButton()
+    let historyContinue = EVAButton(), historyEarlier = EVAButton(), historyOriginal = EVAButton(), historyUndo = EVAButton(), historyNext = EVAButton(), historyUnmerge = EVAButton()
+    let transferButton = EVAButton(), transferPreviewButton = EVAButton()
     let historyBox = NSStackView()
     let chatScroll = NSScrollView()
     let chatStack = FlippedStack()
     let composer = ComposerView()
-    let modelPicker = NSPopUpButton(frame: .zero, pullsDown: false)
+    let modelPicker = EVAPopUp(frame: .zero, pullsDown: false)
     let modelDetailsLabel = EVATheme.label("", size: 10, color: EVATheme.muted)
     let networkScopeLabel = EVATheme.label("Claude Code 与 Codex 均使用官方 CLI 直接连接", size: 10, color: EVATheme.orange)
-    let effortPicker = NSPopUpButton(frame: .zero, pullsDown: false)
-    let modePicker = NSPopUpButton(frame: .zero, pullsDown: false)
-    let sendButton = NSButton(), stopButton = NSButton(), retryButton = NSButton(), attachButton = NSButton()
+    let effortPicker = EVAPopUp(frame: .zero, pullsDown: false)
+    let modePicker = EVAPopUp(frame: .zero, pullsDown: false)
+    let sendButton = EVAButton(), stopButton = EVAButton(), retryButton = EVAButton(), attachButton = EVAButton()
     let attachmentBar = FlippedStack()
     let attachmentScroll = NSScrollView()
     var attachmentHeight: NSLayoutConstraint?
-    let renameButton = NSButton(), archiveThreadButton = NSButton()
+    let renameButton = EVAButton(), archiveThreadButton = EVAButton()
     let inspector = ThemedStack()
-    let inspectorTabs = NSSegmentedControl(labels: ["执行", "文件", "Git", "终端", "插件"], trackingMode: .selectOne, target: nil, action: nil)
+    let inspectorTabs = EVASegmented(labels: ["执行", "文件", "Git", "终端", "插件"], trackingMode: .selectOne, target: nil, action: nil)
     let inspectorText = NSTextView()
     let inspectorTextScroll = NSScrollView()
     let inspectorActions = NSStackView()
@@ -119,11 +121,11 @@ final class NativeWorkbench: NSObject, NSApplicationDelegate, NSWindowDelegate, 
         setThemeAppearance()
         installMenus()
         let screen = NSScreen.main?.visibleFrame ?? NSRect(x: 0, y: 0, width: 1500, height: 1000)
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: min(1500, screen.width - 48), height: min(950, screen.height - 64)), styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: min(1500, screen.width - 48), height: min(950, screen.height - 64)), styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
         window.title = "EVA Workbench"
         window.appearance = nil
         window.backgroundColor = EVATheme.background
-        window.titlebarAppearsTransparent = true
+        window.titlebarAppearsTransparent = true; window.titleVisibility = .hidden
         window.minSize = NSSize(width: 1080, height: 720)
         window.setFrameAutosaveName("EVANativeMainWindow")
         window.isReleasedWhenClosed = false; window.delegate = self
@@ -227,6 +229,26 @@ struct Entry {
             do { try IntroView.renderFrames(to: URL(fileURLWithPath: CommandLine.arguments[index + 1]), times: times); print("intro frames written") } catch { print("render failed:", error); exit(1) }
             return
         }
+        if let index = CommandLine.arguments.firstIndex(of: "--render-markdown"), index + 2 < CommandLine.arguments.count {
+            // Offscreen check of message rendering: --render-markdown <input.md> <output-prefix>
+            let source = (try? String(contentsOfFile: CommandLine.arguments[index + 1], encoding: .utf8)) ?? ""
+            for (name, appearance) in [("dark", NSAppearance.Name.darkAqua), ("light", .aqua)] {
+                let card = MessageCard(message: ["role": "assistant", "text": source, "model": "claude-opus-5-5"], provider: "claude"); card.appearance = NSAppearance(named: appearance)
+                let host = NSView(frame: NSRect(x: 0, y: 0, width: 900, height: 10)); host.appearance = card.appearance; host.wantsLayer = true
+                card.translatesAutoresizingMaskIntoConstraints = false; host.addSubview(card)
+                NSLayoutConstraint.activate([card.leadingAnchor.constraint(equalTo: host.leadingAnchor), card.trailingAnchor.constraint(equalTo: host.trailingAnchor), card.topAnchor.constraint(equalTo: host.topAnchor)])
+                card.update(message: ["role": "assistant", "text": source, "model": "claude-opus-5-5"], provider: "claude", width: 900); host.layoutSubtreeIfNeeded()
+                host.setFrameSize(NSSize(width: 900, height: card.fittingSize.height)); host.layoutSubtreeIfNeeded()
+                host.appearance!.performAsCurrentDrawingAppearance {
+                    guard let rep = host.bitmapImageRepForCachingDisplay(in: host.bounds) else { return }
+                    let base = NSImage(size: host.bounds.size); base.lockFocus(); EVAStyle.base.setFill(); host.bounds.fill(); base.unlockFocus()
+                    host.cacheDisplay(in: host.bounds, to: rep)
+                    let out = NSImage(size: host.bounds.size); out.lockFocus(); EVAStyle.base.setFill(); host.bounds.fill(); rep.draw(in: host.bounds); out.unlockFocus()
+                    if let tiff = out.tiffRepresentation, let png = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) { try? png.write(to: URL(fileURLWithPath: CommandLine.arguments[index + 2] + "-" + name + ".png")) }
+                }
+            }
+            return
+        }
         if CommandLine.arguments.contains("--self-test") {
             let composer = ComposerView(); var sent = 0; composer.onSend = { sent += 1 }; composer.string = "hi"
             func key(_ flags: NSEvent.ModifierFlags) -> NSEvent { NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: flags, timestamp: 0, windowNumber: 0, context: nil, characters: "\r", charactersIgnoringModifiers: "\r", isARepeat: false, keyCode: 36)! }
@@ -236,6 +258,8 @@ struct Entry {
             precondition(string(object(["id": "a"])["id"]) == "a")
             precondition(messageText("# Heading\n```swift\nlet x = 1\n```\nBody").string.contains("let x = 1"))
             precondition(!messageText("<script>example</script>").string.isEmpty)
+            let md = messageText("## 标题\n**粗体** 与 `code` 和 [链接](https://example.com)\n- 列表项\n1. 第一\n> 引用\n| A | B |\n|---|---|\n| 1 | 2 |").string
+            precondition(!md.contains("**") && !md.contains("`") && !md.contains("](") && !md.contains("## ") && !md.contains("|---") && md.contains("•") && md.contains("1.") && md.contains("A\tB"), "Markdown must render, not show source: \(md)")
             let client = NativeAPI(port: 43137); precondition(client.origin == "http://127.0.0.1:43137")
             print("Native AppKit controls, local API and text renderer checks passed; no WebKit host")
             return

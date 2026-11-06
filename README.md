@@ -6,7 +6,7 @@ Windows / macOS 本地 Codex 工作台，红黑主题、启动动画及真实 Co
 
 ## macOS 原生版（Codex + Claude Code 双后端）
 
-`native-macos/` 是 Swift / AppKit 编写的原生桌面应用 **EVA Workbench.app**（0.9.1），界面不使用 WebKit；后端仍是 `workbench/` 中的本地 Node 服务，同时驱动官方 Codex app-server 和官方 Claude Code（`@anthropic-ai/claude-agent-sdk` 随附的 CLI）。
+`native-macos/` 是 Swift / AppKit 编写的原生桌面应用 **EVA Workbench.app**（0.10.1），界面不使用 WebKit；后端仍是 `workbench/` 中的本地 Node 服务，同时驱动官方 Codex app-server 和官方 Claude Code（`@anthropic-ai/claude-agent-sdk` 随附的 CLI）。
 
 主要功能：
 
@@ -18,6 +18,9 @@ Windows / macOS 本地 Codex 工作台，红黑主题、启动动画及真实 Co
 - 上下文、5 小时和每周用量小组件；红黑 / 红白 / 跟随系统主题。
 - 与网页版相同的约 20 秒开场（明朝体、LCL、同步率 99.2% 确认、日文播报与中文字幕），亮色 / 暗色各一套；Esc 跳过，“显示”菜单可关闭。
 - 输入框回车发送，Shift + 回车换行；输入法选字时回车只确认候选词。
+- 界面按网页版重做：红色渐变侧栏、黄黑警示条系统栏、明朝体标题、OPERATION 快捷卡片、红线输入区、扁平自绘按钮与下拉框、两侧红黑警示边；对话区随窗口宽度自适应。
+- 消息支持 Markdown：标题、粗体 / 斜体 / 删除线、行内代码与带语言标签的代码块、有序 / 无序 / 任务列表、引用、表格、链接、分隔线。
+- 对话区背景可在默认原创线稿、自定义图片和无背景之间切换（见下文“更换背景图”）。
 
 ### 安装
 
@@ -110,6 +113,31 @@ api("/api/send", {"threadId": thread["id"], "text": "总结这个项目的结构
 | `POST /api/dev/<操作>` | `projectId` 等 | 终端：`terminal-list` / `terminal-create` / `terminal-input` / `terminal-resize` / `terminal-close`（输出用 `GET /api/dev/terminal-events?id=`）；Git：`git-status` / `git-diff` / `git-action`；插件：`plugins-list` / `plugins-change` |
 | `POST /api/shutdown` | — | 保存状态并结束服务 |
 
+### 更换背景图
+
+对话区右侧的背景默认是一张程序生成的原创抽象线稿。换成自己的图片：
+
+1. 菜单栏 **显示 → 背景图 → 自定义图片…**，选择本机任意图片（PNG / JPG / HEIC / WebP 等）。立即生效。
+2. 程序会自动处理：去色；按当前主题判断明暗，暗色主题下把浅底图片反相成暗底亮线、亮色主题下反之；按高度铺满、靠右对齐，并向对话区左侧渐隐，不影响阅读。
+3. 想恢复：**显示 → 背景图 → 默认线稿**；不要背景：**无背景**。
+
+也可以用命令行设置（重启应用后生效）：
+
+```bash
+defaults write local.eva.dual-workbench native.backdrop custom
+defaults write local.eva.dual-workbench native.backdropImage "/绝对路径/my-art.png"
+# 恢复默认线稿或关闭背景
+defaults write local.eva.dual-workbench native.backdrop linework   # 或 none
+defaults delete local.eva.dual-workbench native.backdropImage
+```
+
+说明：
+
+- 应用只在本机偏好里记下图片路径，不复制、不打包、不上传；移动或删除原图后会自动退回默认线稿。
+- 建议使用纯色背景上的线稿或插画，竖幅、高度 1500 像素以上效果最好；照片也可以，但会显得更“灰”。
+- 请只使用你有权使用的图片；本仓库不附带任何角色图像。
+- 开发者想改默认线稿，可修改 `native-macos/NativeStyle.swift` 中 `Backdrop.linework(size:)`。
+
 ### 环境变量与参数
 
 | 名称 | 作用 |
@@ -122,8 +150,9 @@ api("/api/send", {"threadId": thread["id"], "text": "总结这个项目的结构
 | `CODEX_HOME` | 官方 Codex 配置目录 |
 | `eva-workbench --self-test` | 原生端自检（构建时自动运行） |
 | `eva-workbench --render-intro <目录>` | 不开窗口，把开场的关键帧（亮色 / 暗色）导出为 PNG |
+| `eva-workbench --render-markdown <输入.md> <输出前缀>` | 不开窗口，按亮色 / 暗色渲染一段 Markdown 消息，用于检查排版 |
 
-应用偏好保存在 `defaults read local.eva.dual-workbench`：`native.theme`（`system` / `dark` / `light`）、`native.introEnabled`、`native.introSound`。日志在 `~/Library/Logs/EVA-Workbench.log`，会话数据在 `~/Library/Application Support/EVA-Workbench/workbench/data`，不要上传或提交。
+应用偏好保存在 `defaults read local.eva.dual-workbench`：`native.theme`（`system` / `dark` / `light`）、`native.introEnabled`、`native.introSound`、`native.backdrop`（`linework` / `custom` / `none`）、`native.backdropImage`。日志在 `~/Library/Logs/EVA-Workbench.log`，会话数据在 `~/Library/Application Support/EVA-Workbench/workbench/data`，不要上传或提交。
 
 ### 测试
 

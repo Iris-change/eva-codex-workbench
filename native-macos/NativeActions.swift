@@ -22,14 +22,19 @@ extension NativeWorkbench {
         viewMenu.addItem(withTitle: "工具面板", action: #selector(toggleInspector), keyEquivalent: "i")
         viewMenu.addItem(withTitle: "重播启动序列", action: #selector(replayStartup), keyEquivalent: "")
         let introOnLaunch = viewMenu.addItem(withTitle: "启动时播放开场", action: #selector(toggleIntroOnLaunch(_:)), keyEquivalent: "")
-        introOnLaunch.state = (UserDefaults.standard.object(forKey: "native.introEnabled") as? Bool ?? true) ? .on : .off
+        introOnLaunch.state = introFlag("native.introEnabled") ? .on : .off
         let introSound = viewMenu.addItem(withTitle: "开场日文播报", action: #selector(toggleIntroSound(_:)), keyEquivalent: "")
-        introSound.state = (UserDefaults.standard.object(forKey: "native.introSound") as? Bool ?? true) ? .on : .off
+        introSound.state = introFlag("native.introSound") ? .on : .off
+        let backdropItem = viewMenu.addItem(withTitle: "背景图", action: nil, keyEquivalent: ""), backdropMenu = NSMenu(title: "背景图")
+        for (title, mode) in [("默认线稿", "linework"), ("自定义图片…", "custom"), ("无背景", "none")] {
+            let item = backdropMenu.addItem(withTitle: title, action: #selector(chooseBackdrop(_:)), keyEquivalent: ""); item.representedObject = mode; item.state = Backdrop.mode.rawValue == mode ? .on : .off
+        }
+        viewMenu.setSubmenu(backdropMenu, for: backdropItem)
         view.submenu = viewMenu; bar.addItem(view)
         NSApp.mainMenu = bar
     }
     @objc func showAbout() {
-        let alert = NSAlert(); alert.messageText = "EVA Workbench 0.9.1"
+        let alert = NSAlert(); alert.messageText = "EVA Workbench 0.10.1"
         alert.informativeText = "Swift / AppKit 原生界面\nCodex 与 Claude Code 双后端\n本机历史按需读取，继续时创建独立分支。\n基于 EVA Codex Workbench（MIT）。"
         alert.beginSheetModal(for: window)
     }
@@ -269,19 +274,34 @@ extension NativeWorkbench {
     // Full-window native port of the web boot sequence; holds at 99.2 % until the pilot confirms.
     func showStartupSequence(force: Bool = false) {
         guard introView == nil, let root = window.contentView else { return }
-        if !force && (UserDefaults.standard.object(forKey: "native.introEnabled") as? Bool ?? true) == false { return }
+        if !force && introFlag("native.introEnabled") == false { return }
         if !force && NSWorkspace.shared.accessibilityDisplayShouldReduceMotion { return }
         let intro = IntroView(frame: root.bounds); intro.autoresizingMask = [.width, .height]
         intro.isConnected = { [weak self] in string(self?.state["connection"]) == "connected" }
         intro.onFinish = { [weak self] in guard let self else { return }; self.introView = nil; self.window.makeFirstResponder(self.composer); self.presentApprovalIfNeeded() }
         root.addSubview(intro, positioned: .above, relativeTo: nil); introView = intro; intro.start(interactive: true)
     }
+    // Background art: the default original linework, an image the user picks (path stays in local preferences), or none.
+    @objc func chooseBackdrop(_ sender: NSMenuItem) {
+        guard let mode = sender.representedObject as? String else { return }
+        let apply = { [weak self] in
+            UserDefaults.standard.set(mode, forKey: "native.backdrop")
+            sender.menu?.items.forEach { $0.state = ($0.representedObject as? String) == mode ? .on : .off }
+            self?.backdrop.reload()
+        }
+        guard mode == "custom" else { apply(); return }
+        let panel = NSOpenPanel(); panel.allowedContentTypes = [.image]; panel.allowsMultipleSelection = false; panel.message = "选择一张图片作为对话区背景（只在本机使用，不会上传）"
+        panel.beginSheetModal(for: window) { response in
+            guard response == .OK, let url = panel.url else { return }
+            UserDefaults.standard.set(url.path, forKey: "native.backdropImage"); apply()
+        }
+    }
     @objc func toggleIntroOnLaunch(_ sender: NSMenuItem) {
-        let enabled = !(UserDefaults.standard.object(forKey: "native.introEnabled") as? Bool ?? true)
+        let enabled = !introFlag("native.introEnabled")
         UserDefaults.standard.set(enabled, forKey: "native.introEnabled"); sender.state = enabled ? .on : .off
     }
     @objc func toggleIntroSound(_ sender: NSMenuItem) {
-        let enabled = !(UserDefaults.standard.object(forKey: "native.introSound") as? Bool ?? true)
+        let enabled = !introFlag("native.introSound")
         UserDefaults.standard.set(enabled, forKey: "native.introSound"); sender.state = enabled ? .on : .off
     }
 }
