@@ -131,7 +131,7 @@ class ClaudeWorkbench{
     finish({behavior:'allow',updatedInput:input});
    });
    const questions=name==='AskUserQuestion'?(input.questions||[]).map((q,i)=>({id:String(i),question:q.question,options:q.options})):undefined;
-   this.approvals.set(id,{id,provider:'claude',method:name==='AskUserQuestion'?'item/tool/requestUserInput':'claude/tool/requestApproval',params:{threadId:t.id,cwd:this.project(t.projectId).path,reason:'Claude Code 请求执行 '+name,command:JSON.stringify({tool:name,input},null,2),questions}});
+   this.approvals.set(id,{id,provider:'claude',method:name==='AskUserQuestion'?'item/tool/requestUserInput':'claude/tool/requestApproval',params:{threadId:t.id,toolUseId:context?.toolUseID||null,cwd:this.project(t.projectId).path,reason:'Claude Code 请求执行 '+name,command:JSON.stringify({tool:name,input},null,2),questions}});
    context.signal?.addEventListener('abort',abort,{once:true});if(context.signal?.aborted)abort();this.notify();
   });
  }
@@ -160,7 +160,7 @@ class ClaudeWorkbench{
   const old=entry.before.split('\n'),next=after.split('\n');
   // A complete-file replacement hunk remains exact for repeated strings and multi-edit operations.
   const diff='--- a/'+filename+'\n+++ b/'+filename+'\n@@ -1,'+old.length+' +1,'+next.length+' @@\n'+old.map(x=>'-'+x).join('\n')+'\n'+next.map(x=>'+'+x).join('\n');
-  t.tools.push({id:'change-'+e.tool_use_id,type:'fileChange',status:'completed',changes:[{path:filename,diff}]});this.changed();
+  t.tools.push({id:'change-'+e.tool_use_id,type:'fileChange',status:'completed',changes:[{path:filename,diff}],at:(t.messages||[]).length,startedAt:Date.now(),endedAt:Date.now()});this.changed();
  }
  async send(t,input){
   if(this.status.connection!=='connected'||!this.status.account.signedIn)throw Error('请先登录 Claude Code 并刷新');
@@ -210,9 +210,9 @@ class ClaudeWorkbench{
    const msg=m.message,id=msg.id||m.uuid,text=msg.content.filter(c=>c.type==='text').map(c=>c.text).join('\n');
    if(msg.model){t.lastResponseModel=msg.model;active.responseModel=msg.model;const existing=t.messages.find(x=>x.id===id);if(existing)existing.model=msg.model}
    if(text&&!active.streamed.has(id)){active.assistantStarted=true;const existing=t.messages.find(x=>x.id===id);if(existing)existing.text+=text;else t.messages.push({id,role:'assistant',text,...(msg.model?{model:msg.model}:{})})}
-   for(const c of msg.content.filter(c=>c.type==='tool_use'))if(!t.tools.some(x=>x.id===c.id))t.tools.push({id:c.id,type:'claudeTool',name:c.name,input:c.input,status:'inProgress'});
+   for(const c of msg.content.filter(c=>c.type==='tool_use'))if(!t.tools.some(x=>x.id===c.id))t.tools.push({id:c.id,type:'claudeTool',name:c.name,input:c.input,status:'inProgress',at:(t.messages||[]).length,startedAt:Date.now()});
   }
-  if(m.type==='user'&&Array.isArray(m.message?.content))for(const c of m.message.content.filter(c=>c.type==='tool_result')){const tool=t.tools.find(x=>x.id===c.tool_use_id);if(tool){tool.status=c.is_error?'failed':'completed';tool.output=typeof c.content==='string'?c.content:JSON.stringify(c.content)}}
+  if(m.type==='user'&&Array.isArray(m.message?.content))for(const c of m.message.content.filter(c=>c.type==='tool_result')){const tool=t.tools.find(x=>x.id===c.tool_use_id);if(tool){tool.endedAt=Date.now();tool.status=c.is_error?'failed':'completed';tool.output=typeof c.content==='string'?c.content:JSON.stringify(c.content)}}
   if(m.type==='result'){
    if(m.subtype==='success'&&!m.is_error&&active.transferInjected&&t.transfer)t.transfer.pending=false;
    if(m.session_id)t.sessionId=m.session_id;t.usage=m.usage;

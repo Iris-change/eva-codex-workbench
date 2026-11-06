@@ -34,7 +34,7 @@ extension NativeWorkbench {
         NSApp.mainMenu = bar
     }
     @objc func showAbout() {
-        let alert = NSAlert(); alert.messageText = "EVA Workbench 0.10.2"
+        let alert = NSAlert(); alert.messageText = "EVA Workbench 0.11.0"
         alert.informativeText = "Swift / AppKit 原生界面\nCodex 与 Claude Code 双后端\n本机历史按需读取，继续时创建独立分支。\n基于 EVA Codex Workbench（MIT）。"
         alert.beginSheetModal(for: window)
     }

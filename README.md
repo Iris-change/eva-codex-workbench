@@ -6,7 +6,7 @@ Windows / macOS 本地 Codex 工作台，红黑主题、启动动画及真实 Co
 
 ## macOS 原生版（Codex + Claude Code 双后端）
 
-`native-macos/` 是 Swift / AppKit 编写的原生桌面应用 **EVA Workbench.app**（0.10.2），界面不使用 WebKit；后端仍是 `workbench/` 中的本地 Node 服务，同时驱动官方 Codex app-server 和官方 Claude Code（`@anthropic-ai/claude-agent-sdk` 随附的 CLI）。
+`native-macos/` 是 Swift / AppKit 编写的原生桌面应用 **EVA Workbench.app**（0.11.0），界面不使用 WebKit；后端仍是 `workbench/` 中的本地 Node 服务，同时驱动官方 Codex app-server 和官方 Claude Code（`@anthropic-ai/claude-agent-sdk` 随附的 CLI）。
 
 主要功能：
 
@@ -19,6 +19,7 @@ Windows / macOS 本地 Codex 工作台，红黑主题、启动动画及真实 Co
 - 与网页版相同的约 20 秒开场（明朝体、LCL、同步率 99.2% 确认、日文播报与中文字幕），亮色 / 暗色各一套；Esc 跳过，“显示”菜单可关闭。
 - 输入框回车发送，Shift + 回车换行；输入法选字时回车只确认候选词。
 - 界面按网页版重做：红色渐变侧栏、黄黑警示条系统栏、明朝体标题、OPERATION 快捷卡片、红线输入区、扁平自绘按钮与下拉框、两侧红黑警示边；对话区随窗口宽度自适应。
+- 执行过程实时可见：命令、文件读写与修改、搜索、网页、子任务、MCP 等每一步按发生顺序插在对话中，显示进行中 / 完成 / 失败 / 等待确认与耗时，点击展开输出或差异；底部实时显示“正在运行命令…”“正在思考…”等当前状态。
 - 消息支持 Markdown：标题、粗体 / 斜体 / 删除线、行内代码与带语言标签的代码块、有序 / 无序 / 任务列表、引用、表格、链接、分隔线。
 - 对话区背景可在默认原创线稿、自定义图片和无背景之间切换（见下文“更换背景图”）。
 
@@ -151,6 +152,7 @@ defaults delete local.eva.dual-workbench native.backdropImage
 | `eva-workbench --self-test` | 原生端自检（构建时自动运行） |
 | `eva-workbench --render-intro <目录>` | 不开窗口，把开场的关键帧（亮色 / 暗色）导出为 PNG |
 | `eva-workbench --render-markdown <输入.md> <输出前缀>` | 不开窗口，按亮色 / 暗色渲染一段 Markdown 消息，用于检查排版 |
+| `eva-workbench --render-activity <输出前缀>` | 不开窗口，用示例数据渲染执行步骤（进行中 / 完成 / 失败 / 等待确认），用于检查样式 |
 
 应用偏好保存在 `defaults read local.eva.dual-workbench`：`native.theme`（`system` / `dark` / `light`）、`native.introEnabled`、`native.introSound`、`native.backdrop`（`linework` / `custom` / `none`）、`native.backdropImage`。日志在 `~/Library/Logs/EVA-Workbench.log`，会话数据在 `~/Library/Application Support/EVA-Workbench/workbench/data`，不要上传或提交。
 

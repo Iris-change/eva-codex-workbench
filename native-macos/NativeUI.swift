@@ -312,7 +312,7 @@ extension NativeWorkbench {
 
     func renderMessages(force: Bool) {
         let t = selectedThread ?? [:], messages = objects(t["messages"])
-        let signature = selectedThreadID + messages.map { string($0["id"]) + string($0["text"]) + string($0["model"]) + objects($0["attachments"]).map { string($0["id"]) }.joined() }.joined(separator: "|")
+        let signature = selectedThreadID + messages.map { string($0["id"]) + string($0["text"]) + string($0["model"]) + objects($0["attachments"]).map { string($0["id"]) }.joined() }.joined(separator: "|") + "#" + activitySignature(t)
         let width = max(280, chatScroll.contentView.bounds.width)
         if signature == messageSignature && !force { for view in cards.values { view.body.preferredMaxLayoutWidth = width - 34 }; return }
         let atBottom = chatStack.bounds.height - chatScroll.contentView.bounds.maxY < 100
@@ -330,7 +330,13 @@ extension NativeWorkbench {
             welcome.widthAnchor.constraint(equalTo: chatStack.widthAnchor).isActive = true
         } else {
             var previousImported = false
-            for message in messages {
+            let activity = activitySnapshot(t)
+            func addSteps(_ position: Int) {
+                for view in stepViews(activity.byPosition[position] ?? []) { chatStack.addArrangedSubview(view); view.widthAnchor.constraint(equalTo: chatStack.widthAnchor).isActive = true }
+            }
+            addSteps(0)
+            for (index, message) in messages.enumerated() {
+                defer { addSteps(index + 1) }
                 if previousImported && !flag(message["imported"]) {
                     let divider = EVATheme.label("—— 以下由 \(providerName) 继续 ——", size: 10, color: EVATheme.orange); divider.alignment = .center
                     chatStack.addArrangedSubview(divider); divider.widthAnchor.constraint(equalTo: chatStack.widthAnchor).isActive = true
@@ -339,6 +345,12 @@ extension NativeWorkbench {
                 let id = string(message["id"]), card = cards[id] ?? MessageCard(message: message, provider: provider)
                 cards[id] = card; card.onImage = { [weak self] file in self?.openImage(file) }; card.update(message: message, provider: provider, width: width)
                 chatStack.addArrangedSubview(card); card.widthAnchor.constraint(equalTo: chatStack.widthAnchor).isActive = true
+            }
+            // Steps recorded beyond the last message (e.g. after the transcript was trimmed) still show at the end.
+            for position in activity.byPosition.keys.sorted() where position > messages.count { addSteps(position) }
+            if let live = activity.live {
+                let row = ActivityStatusRow(live, waiting: activity.waiting); chatStack.addArrangedSubview(row); row.widthAnchor.constraint(equalTo: chatStack.widthAnchor).isActive = true
+                taskLabel.stringValue = live; taskLabel.toolTip = live
             }
         }
         window?.contentView?.layoutSubtreeIfNeeded()

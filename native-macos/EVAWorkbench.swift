@@ -41,6 +41,7 @@ final class NativeWorkbench: NSObject, NSApplicationDelegate, NSWindowDelegate, 
     var selectedModel = "", selectedEffort = "", mode = "read-only"
     var catalogSignature = "", renderedThread = "", messageSignature = "__unrendered__", toolSignature = ""
     var cards: [String: MessageCard] = [:]
+    var expandedSteps = Set<String>()
     var imageWindows: [NSWindow] = []
     var shownApproval = ""
     var approvalFields: [String: NSTextField] = [:]
@@ -229,6 +230,35 @@ struct Entry {
             do { try IntroView.renderFrames(to: URL(fileURLWithPath: CommandLine.arguments[index + 1]), times: times); print("intro frames written") } catch { print("render failed:", error); exit(1) }
             return
         }
+        if let index = CommandLine.arguments.firstIndex(of: "--render-activity"), index + 1 < CommandLine.arguments.count {
+            // Offscreen check of the execution transcript: --render-activity <output-prefix>
+            let now = Date().timeIntervalSince1970 * 1000, project = "/Users/me/demo"
+            let tools: [JSON] = [
+                ["id": "t1", "type": "claudeTool", "name": "Bash", "input": ["command": "ssh build-server 'echo ok; hostname'"], "status": "completed", "output": "ok\nbuild-server", "startedAt": now - 2400, "endedAt": now - 1900],
+                ["id": "t2", "type": "claudeTool", "name": "Edit", "input": ["file_path": project + "/src/retry.js"], "status": "completed", "startedAt": now - 1800, "endedAt": now - 1700],
+                ["id": "change-t2", "type": "fileChange", "changes": [["path": project + "/src/retry.js", "diff": "-  retries: 1\n+  retries: 3\n+  backoff: [2, 3, 4]"]]],
+                ["id": "t3", "type": "claudeTool", "name": "WebSearch", "input": ["query": "retry backoff best practices"], "status": "failed", "output": "rate limited", "startedAt": now - 1600, "endedAt": now - 1500],
+                ["id": "t4", "type": "claudeTool", "name": "Bash", "input": ["command": "npm test"], "status": "inProgress", "startedAt": now - 12000],
+                ["id": "c5", "type": "commandExecution", "command": "git push origin main", "status": "inProgress", "startedAt": now - 3000]]
+            let steps = tools.compactMap { stepInfo($0, project: project, tools: tools, waiting: ["c5"]) }
+            for (name, appearance) in [("dark", NSAppearance.Name.darkAqua), ("light", .aqua)] {
+                let stack = FlippedStack(); stack.orientation = .vertical; stack.alignment = .leading; stack.spacing = 2; stack.appearance = NSAppearance(named: appearance)
+                stack.frame = NSRect(x: 0, y: 0, width: 900, height: 10)
+                var views: [NSView] = [MessageCard(message: ["role": "user", "text": "继续，把重试逻辑补上。"], provider: "claude")]
+                views += steps.map { StepRow($0, expanded: $0.id == "t2" || $0.id == "t1", onToggle: { _ in }) }
+                views.append(ActivityStatusRow("Claude Code 正在运行命令：npm test", waiting: false))
+                views.append(ActivityStatusRow("等待你确认操作…", waiting: true))
+                for view in views { stack.addArrangedSubview(view); view.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true }
+                stack.layoutSubtreeIfNeeded(); stack.setFrameSize(NSSize(width: 900, height: stack.fittingSize.height)); stack.layoutSubtreeIfNeeded()
+                stack.appearance!.performAsCurrentDrawingAppearance {
+                    guard let rep = stack.bitmapImageRepForCachingDisplay(in: stack.bounds) else { return }
+                    stack.cacheDisplay(in: stack.bounds, to: rep)
+                    let out = NSImage(size: stack.bounds.size); out.lockFocus(); EVAStyle.base.setFill(); stack.bounds.fill(); rep.draw(in: stack.bounds); out.unlockFocus()
+                    if let tiff = out.tiffRepresentation, let png = NSBitmapImageRep(data: tiff)?.representation(using: .png, properties: [:]) { try? png.write(to: URL(fileURLWithPath: CommandLine.arguments[index + 1] + "-" + name + ".png")) }
+                }
+            }
+            return
+        }
         if let index = CommandLine.arguments.firstIndex(of: "--render-markdown"), index + 2 < CommandLine.arguments.count {
             // Offscreen check of message rendering: --render-markdown <input.md> <output-prefix>
             let source = (try? String(contentsOfFile: CommandLine.arguments[index + 1], encoding: .utf8)) ?? ""
@@ -260,6 +290,9 @@ struct Entry {
             precondition(!messageText("<script>example</script>").string.isEmpty)
             let withFiles = MessageCard(message: ["role": "user", "text": "看看这张照片", "attachments": [["id": "a", "name": "IMG_0001-a-very-long-photo-name.HEIC", "mime": "image/png"], ["id": "b", "name": "report.pdf", "mime": "application/octet-stream"]]], provider: "claude")
             precondition(withFiles.attachments.arrangedSubviews.count == 2, "messages with attachments must render")
+            let sampleTools: [JSON] = [["id": "b", "type": "claudeTool", "name": "Bash", "input": ["command": "ls -la"], "status": "inProgress"], ["id": "change-e", "type": "fileChange", "changes": []], ["id": "x", "type": "commandExecution", "command": ["git", "status"], "status": "completed", "exitCode": 1], ["id": "r", "type": "reasoning", "summary": []]]
+            let mapped = sampleTools.compactMap { stepInfo($0, project: "/p", tools: sampleTools, waiting: ["b"]) }
+            precondition(mapped.count == 2 && mapped[0].label == "运行命令" && mapped[0].detail == "ls -la" && mapped[0].state == .waiting && mapped[1].detail.contains("git status") && mapped[1].detail.contains("退出码 1"), "tool steps must be described")
             let md = messageText("## 标题\n**粗体** 与 `code` 和 [链接](https://example.com)\n- 列表项\n1. 第一\n> 引用\n| A | B |\n|---|---|\n| 1 | 2 |").string
             precondition(!md.contains("**") && !md.contains("`") && !md.contains("](") && !md.contains("## ") && !md.contains("|---") && md.contains("•") && md.contains("1.") && md.contains("A\tB"), "Markdown must render, not show source: \(md)")
             let client = NativeAPI(port: 43137); precondition(client.origin == "http://127.0.0.1:43137")
