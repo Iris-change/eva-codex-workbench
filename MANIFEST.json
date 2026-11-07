@@ -15,8 +15,8 @@
     },
     {
       "path": "ASSETS.md",
-      "bytes": 874,
-      "sha256": "734bad304fea97109773d034b14513cef2ca5a4f82b8a8d1f5edf131db3afb79"
+      "bytes": 1034,
+      "sha256": "0e0516cfd84474ebc651c92453d88dba92ea380e72de1593ddddb57f84c7190c"
     },
     {
       "path": "CODE-ORIGINS.md",
@@ -35,8 +35,8 @@
     },
     {
       "path": "LICENSE-STATUS.md",
-      "bytes": 332,
-      "sha256": "5402e9e918d0849dffd98b45fce0db64fe2e96a987953a9fe1cd5c9864c8471c"
+      "bytes": 359,
+      "sha256": "72990e1b39a2f007b6c3849f6a19a62f7b894cf58a8fc26ff831283fcfc42805"
     },
     {
       "path": "licenses/DragonCodexBoot-MIT.txt",
@@ -55,13 +55,13 @@
     },
     {
       "path": "PUBLIC-RELEASE-CHECKLIST.md",
-      "bytes": 1136,
-      "sha256": "049bf40b8071cca468e963c0d34e4d4d90d2dcbce0c57d7434065b85a00be1de"
+      "bytes": 1177,
+      "sha256": "38adce86c4c8a4763c519d271abf14afb5deb99cbb128092e5e7ac9125416f7c"
     },
     {
       "path": "README.md",
-      "bytes": 3909,
-      "sha256": "4beb9a4137573fc8b13b3d0aed5948995a0f8c77691b126ab867d78674a7eb24"
+      "bytes": 3955,
+      "sha256": "8bdf3e64be1ba29fe620d6b221b9dfea57cc83fabfe23ee1e54c409965f4e5e3"
     },
     {
       "path": "Start-EVA.cmd",
@@ -235,8 +235,8 @@
     },
     {
       "path": "workbench/public/media/eva/nerv-mark.svg",
-      "bytes": 398,
-      "sha256": "b9bb4d189d2753544e80b3bdb14a026433580c74e7b192ad6207286a056c6c98"
+      "bytes": 30557,
+      "sha256": "13ac9ff9455440475e8846ef920f8bdfa18dd54ec07b9cfbf71073389c4cb9b5"
     },
     {
       "path": "workbench/public/media/eva/theme-title.svg",
