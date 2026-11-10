@@ -15,8 +15,8 @@
     },
     {
       "path": "ASSETS.md",
-      "bytes": 1034,
-      "sha256": "0e0516cfd84474ebc651c92453d88dba92ea380e72de1593ddddb57f84c7190c"
+      "bytes": 1263,
+      "sha256": "0985ae5f850b5b6264fa71a9e0eaf2a2eeb2e83c8d7bb9c8f1264dfdca98dc99"
     },
     {
       "path": "CODE-ORIGINS.md",
@@ -55,13 +55,13 @@
     },
     {
       "path": "PUBLIC-RELEASE-CHECKLIST.md",
-      "bytes": 1177,
-      "sha256": "38adce86c4c8a4763c519d271abf14afb5deb99cbb128092e5e7ac9125416f7c"
+      "bytes": 1239,
+      "sha256": "34e42c341f986219798a05ec4647b9d7d1117642f5bbbddd2f57fbb3a91d5403"
     },
     {
       "path": "README.md",
-      "bytes": 3955,
-      "sha256": "8bdf3e64be1ba29fe620d6b221b9dfea57cc83fabfe23ee1e54c409965f4e5e3"
+      "bytes": 3930,
+      "sha256": "f53efaf2a5f54d5ac223390658327a84cf6f7b93f28d5f9c1e62ab06b0e13061"
     },
     {
       "path": "Start-EVA.cmd",
@@ -205,8 +205,8 @@
     },
     {
       "path": "workbench/public/intro.html",
-      "bytes": 1780,
-      "sha256": "c8cf65222846cccdd81d8d2bcacdaf622317ae9c5af7d4ea4f8ccc6e3bae5700"
+      "bytes": 1768,
+      "sha256": "ebb96e46d220ae8870b8f118cab1f572e0bc3107918a721240a2b9711f2ea750"
     },
     {
       "path": "workbench/public/intro.js",
@@ -247,6 +247,16 @@
       "path": "workbench/public/media/official/codex-node.svg",
       "bytes": 282,
       "sha256": "5eab43291f55b158fe2eac585cd5e44875ea1e08caeea486fe088b2c023add3f"
+    },
+    {
+      "path": "workbench/public/media/pilot/asuka-black.png",
+      "bytes": 1351230,
+      "sha256": "d608975371d33e296329047b4dccc082d805c57da3f54ad6616dbf7bd5bc2338"
+    },
+    {
+      "path": "workbench/public/media/pilot/asuka-linework.png",
+      "bytes": 1409156,
+      "sha256": "eed3929cece3178a96a133919afc0c8ae6d6c7b4a27f11cf2c8e9531451ef1c4"
     },
     {
       "path": "workbench/public/media/pilot/pilot-linework.svg",
@@ -301,7 +311,7 @@
     {
       "path": "workbench/public/unit02.css",
       "bytes": 11245,
-      "sha256": "e2689c91d4a47a7566fb1f81726b96340dba95cdabbf1bcd4dcb8e5ae0d702e5"
+      "sha256": "b4ae09496409d479568e489f75b66dd18087334d2b7cef533ed27695d836910b"
     },
     {
       "path": "workbench/public/vendor/HTML-TO-IMAGE-LICENSE.txt",
