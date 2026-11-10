@@ -10,3 +10,4 @@ workbench/tools/diagnostic-logs/
 *.mp4
 *.zip
 PRIVATE*/
+build-native/

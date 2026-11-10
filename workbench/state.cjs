@@ -19,12 +19,13 @@ function reduceEvent(thread,method,p){
       if(item.text)msg.text=item.text;
     }else if(item.type!=='userMessage'){
       const index=thread.tools.findIndex(x=>x.id===item.id);
-      if(index<0)thread.tools.push(item);else thread.tools[index]={...thread.tools[index],...item};
+      // at = number of messages when the step started, so clients can place it in the transcript in order.
+      if(index<0)thread.tools.push({...item,at:thread.messages.length,startedAt:Date.now()});else thread.tools[index]={...thread.tools[index],...item,...(method==='item/completed'?{endedAt:Date.now()}:{})};
     }
   }
   if(method==='item/commandExecution/outputDelta'){
     let item=thread.tools.find(x=>x.id===p.itemId);
-    if(!item){item={id:p.itemId,type:'commandExecution',status:'inProgress',aggregatedOutput:''};thread.tools.push(item)}
+    if(!item){item={id:p.itemId,type:'commandExecution',status:'inProgress',aggregatedOutput:'',at:thread.messages.length,startedAt:Date.now()};thread.tools.push(item)}
     item.aggregatedOutput=(item.aggregatedOutput||'')+p.delta;
   }
   if(method==='thread/tokenUsage/updated')thread.usage=p.tokenUsage;
