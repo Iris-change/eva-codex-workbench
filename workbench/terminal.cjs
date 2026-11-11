@@ -1,17 +1,22 @@
 'use strict';
 const crypto=require('node:crypto'),path=require('node:path'),fs=require('node:fs');
 class TerminalManager{
- constructor({spawn}={}){this.spawn=spawn;this.sessions=new Map()}
+ constructor({spawn,platform=process.platform,env=process.env,existsSync=fs.existsSync}={}){this.spawn=spawn;this.platform=platform;this.env=env;this.existsSync=existsSync;this.sessions=new Map()}
  list(projectId){return [...this.sessions.values()].filter(s=>s.projectId===projectId).map(({id,projectId,title,exitCode})=>({id,projectId,title,exitCode}))}
  get(id){const s=this.sessions.get(id);if(!s)throw Error('终端已关闭，请新建终端');return s}
  create(project){if(this.sessions.size>=8)throw Error('最多同时打开 8 个终端，请先关闭不用的终端');
   let spawn=this.spawn;try{spawn||=require('node-pty').spawn}catch{throw Error('缺少终端依赖，请在 workbench 目录运行 npm ci')}
-  const modernShell=(process.env.PATH||'').split(path.delimiter).map(dir=>path.join(dir,'pwsh.exe')).find(file=>fs.existsSync(file));
-  const shell=process.platform==='win32'?(modernShell||path.join(process.env.SystemRoot||'C:\\Windows','System32','WindowsPowerShell','v1.0','powershell.exe')):'/bin/bash';
-  const env={...process.env};delete env.HACKCLAW_CODEX;delete env.HACKCLAW_DATA_DIR;delete env.EVA_LAUNCH_READY;
-  if(process.platform==='win32'&&!modernShell&&env.PSModulePath)env.PSModulePath=env.PSModulePath.split(';').filter(dir=>!/PowerShell[\\/]7[\\/]Modules[\\/]?$/i.test(dir)).join(';');
-  const child=spawn(shell,process.platform==='win32'?['-NoLogo','-NoProfile']:['--noprofile','--norc'],{name:'xterm-256color',cols:100,rows:24,cwd:project.path,env});
-  const s={id:crypto.randomUUID(),projectId:project.id,title:'PowerShell '+(this.sessions.size+1),exitCode:null,child,buffer:'',sequence:0,chunks:[],clients:new Set()};this.sessions.set(s.id,s);
+  const windows=this.platform==='win32',env={...this.env};
+  // process.env is case-insensitive on Windows; its plain-object copy is not.
+  const envKey=name=>Object.keys(env).find(key=>key.toLowerCase()===name.toLowerCase());
+  const modernShell=windows&&(env[envKey('PATH')]||'').split(';').map(dir=>path.win32.join(dir,'pwsh.exe')).find(file=>this.existsSync(file));
+  const shell=windows?(modernShell||path.win32.join(env[envKey('SystemRoot')]||'C:\\Windows','System32','WindowsPowerShell','v1.0','powershell.exe')):this.platform==='darwin'?(env.SHELL||'/bin/zsh'):'/bin/bash';
+  const name=windows?'PowerShell':path.posix.basename(shell),args=windows?['-NoLogo','-NoProfile']:name==='bash'?['--noprofile','--norc']:['-l'];
+  delete env.HACKCLAW_CODEX;delete env.HACKCLAW_DATA_DIR;delete env.EVA_LAUNCH_READY;
+  const modulePathKey=windows&&envKey('PSModulePath');
+  if(windows&&!modernShell&&env[modulePathKey])env[modulePathKey]=env[modulePathKey].split(';').filter(dir=>!/PowerShell[\\/]7[\\/]Modules[\\/]?$/i.test(dir)).join(';');
+  const child=spawn(shell,args,{name:'xterm-256color',cols:100,rows:24,cwd:project.path,env});
+  const s={id:crypto.randomUUID(),projectId:project.id,title:name+' '+(this.sessions.size+1),exitCode:null,child,buffer:'',sequence:0,chunks:[],clients:new Set()};this.sessions.set(s.id,s);
   child.onData(data=>{s.buffer=(s.buffer+data).slice(-512*1024);const event={seq:++s.sequence,data};s.chunks.push(event);while(s.chunks.length>1500)s.chunks.shift();for(const c of s.clients){if(c.writableLength>1024*1024){c.end();s.clients.delete(c)}else c.write('id: '+event.seq+'\ndata: '+JSON.stringify(event)+'\n\n')}});
   child.onExit(({exitCode})=>{s.exitCode=exitCode;for(const c of s.clients)c.write('event: ended\ndata: '+JSON.stringify({exitCode})+'\n\n')});return {id:s.id,projectId:s.projectId,title:s.title,exitCode:s.exitCode};
  }
